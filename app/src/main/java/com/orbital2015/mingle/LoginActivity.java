@@ -9,12 +9,18 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.parse.LogInCallback;
+import com.parse.ParseException;
+import com.parse.ParseUser;
+
 
 public class LoginActivity extends ActionBarActivity {
 
     private EditText loginUsernameEditText;
     private EditText loginPasswordEditText;
     private Button loginButton;
+    private String m_username;
+    private String m_password;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,20 +34,25 @@ public class LoginActivity extends ActionBarActivity {
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(checkCredentials(loginUsernameEditText.getText().toString(), loginPasswordEditText.getText().toString())){
-                    //TODO: start next activity and start sinch service
-                    Toast.makeText(getApplicationContext(), "Login Success",Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(getApplicationContext(), "Incorrect Username/Password",Toast.LENGTH_SHORT).show();
-                }
+                m_username = loginUsernameEditText.getText().toString();
+                m_password = loginPasswordEditText.getText().toString();
+                ParseUser.logInInBackground(m_username, m_password, new LogInCallback() {
+                    @Override
+                    public void done(ParseUser parseUser, ParseException e) {
+                        if(parseUser != null){
+                            //start sinch service
+                            //start next activity
+                        } else {
+                            Toast.makeText(getApplicationContext(),
+                                    "There was an error logging in.",
+                                    Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
             }
         });
     }
 
-    private boolean checkCredentials(String userName, String password){
-        //TODO: authentication logic here
-        return true;
-    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
