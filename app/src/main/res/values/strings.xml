@@ -9,5 +9,12 @@
     <string name="login_password_text">Password:</string>
     <string name="login_password_edit_text_view">Password</string>
     <string name="login_button_text_view">Login</string>
+    <string name="title_activity_main">MainActivity</string>
+
+    <string name="hello_world">Hello world!</string>
     <!--End of login activity string values -->
+
+    <!--Main activity string values -->
+    <string name="logout_button_text_view">Logout</string>
+    <!-- End of main activity string values -->
 </resources>
