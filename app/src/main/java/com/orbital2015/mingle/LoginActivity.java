@@ -1,5 +1,6 @@
 package com.orbital2015.mingle;
 
+import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -21,6 +22,8 @@ public class LoginActivity extends ActionBarActivity {
     private Button loginButton;
     private String m_username;
     private String m_password;
+    private Intent intent;
+    private Intent serviceIntent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +33,15 @@ public class LoginActivity extends ActionBarActivity {
         loginUsernameEditText = (EditText) findViewById(R.id.loginUsernameEditText);
         loginPasswordEditText = (EditText) findViewById(R.id.loginPasswordEditText);
         loginButton = (Button) findViewById(R.id.loginButton);
+        intent = new Intent(getApplicationContext(), MainActivity.class);
+        serviceIntent = new Intent(getApplicationContext(), MessageService.class);
+
+        ParseUser currentUser = ParseUser.getCurrentUser();
+
+        if(currentUser != null){
+            startService(serviceIntent);
+            startActivity(intent);
+        }
 
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -40,8 +52,8 @@ public class LoginActivity extends ActionBarActivity {
                     @Override
                     public void done(ParseUser parseUser, ParseException e) {
                         if(parseUser != null){
-                            //start sinch service
-                            //start next activity
+                            startService(serviceIntent);
+                            startActivity(intent);
                         } else {
                             Toast.makeText(getApplicationContext(),
                                     "There was an error logging in.",

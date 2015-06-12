@@ -112,4 +112,10 @@ public class MainActivity extends ActionBarActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
+    @Override
+    public void onDestroy(){
+        stopService(new Intent(this, MessageService.class));
+        super.onDestroy();
+    }
 }
