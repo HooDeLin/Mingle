@@ -11,6 +11,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.parse.ParseUser;
@@ -20,6 +21,7 @@ import com.sinch.android.rtc.messaging.MessageClient;
 import com.sinch.android.rtc.messaging.MessageClientListener;
 import com.sinch.android.rtc.messaging.MessageDeliveryInfo;
 import com.sinch.android.rtc.messaging.MessageFailureInfo;
+import com.sinch.android.rtc.messaging.WritableMessage;
 
 import java.util.List;
 
@@ -28,6 +30,8 @@ public class MessagingActivity extends ActionBarActivity {
 
     private String recipientId;
     private EditText messageBodyField;
+    private ListView messagesList;
+    private MessageAdapter messageAdapter;
     private Button sendButton;
     private String messageBody;
     private MessageService.MessageServiceInterface messageService;
@@ -47,6 +51,10 @@ public class MessagingActivity extends ActionBarActivity {
         currentUserId = ParseUser.getCurrentUser().getObjectId();
 
         messageBodyField = (EditText) findViewById(R.id.messageBodyField);
+
+        messagesList = (ListView) findViewById(R.id.listMessages);
+        messageAdapter = new MessageAdapter(this);
+        messagesList.setAdapter(messageAdapter);
 
         //listen for a click on the send button
         sendButton = (Button) findViewById(R.id.sendButton);
@@ -110,12 +118,16 @@ public class MessagingActivity extends ActionBarActivity {
 
         @Override
         public void onIncomingMessage(MessageClient messageClient, Message message) {
-            //Display an incoming message
+            if(message.getSenderId().equals(recipientId)){
+                WritableMessage writableMessage = new WritableMessage(message.getRecipientIds().get(0), message.getTextBody());
+                messageAdapter.addMessage(writableMessage, MessageAdapter.DIRECTION_INCOMING);
+            }
         }
 
         @Override
         public void onMessageSent(MessageClient messageClient, Message message, String s) {
-            //Display the message that was just sent
+            WritableMessage writableMessage = new WritableMessage(message.getRecipientIds().get(0), message.getTextBody());
+            messageAdapter.addMessage(writableMessage, MessageAdapter.DIRECTION_OUTGOING);
         }
 
         @Override
