@@ -16,5 +16,10 @@
 
     <!--Main activity string values -->
     <string name="logout_button_text_view">Logout</string>
+    <string name="title_activity_messaging">MessagingActivity</string>
     <!-- End of main activity string values -->
+
+    <!-- Messaging activity string values -->
+    <string name="message_elipses">Message...</string>
+    <!-- End of messaging activity string values -->
 </resources>
