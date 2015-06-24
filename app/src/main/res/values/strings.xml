@@ -21,5 +21,6 @@
 
     <!-- Messaging activity string values -->
     <string name="message_elipses">Message...</string>
+    <string name="title_activity_nearby">NearbyActivity</string>
     <!-- End of messaging activity string values -->
 </resources>
