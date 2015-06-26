@@ -1,28 +1,50 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.orbital2015.mingle.NearbyActivity"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical" >
 
-    <Button
-        android:layout_width="fill_parent"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/logout_button_text_view"
-        android:id="@+id/logoutButton"
-        android:gravity="center_vertical|center_horizontal"
-        android:layout_gravity="center_horizontal"
-        android:background="#ffb3b3b3"
-        android:textSize="24sp"
-        android:padding="15dp"
-        android:textColor="#ff63029d" />
+        android:id="@+id/buttonContainer"
+        android:weightSum="3">
+
+        <Button
+            android:id="@+id/nearbyButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:enabled="false"
+            android:layout_alignParentBottom="true"
+            android:text="@string/nearby_button_text_view" />
+
+        <Button
+            android:id="@+id/chatButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_alignParentBottom="true"
+            android:layout_toRightOf="@+id/nearbyButton"
+            android:text="@string/chat_button_text_view"/>
+
+        <Button
+            android:id="@+id/settingsButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_alignParentBottom="true"
+            android:layout_toRightOf="@+id/chatButton"
+            android:text="@string/settings_button_text_view"/>
+    </LinearLayout>
 
     <ListView xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="16dp"
         android:background="#fffafafa"
-        android:id="@+id/usersListView">
+        android:id="@+id/usersListView"
+        android:layout_below="@+id/buttonContainer">
     </ListView>
 
-</LinearLayout>
+</RelativeLayout>

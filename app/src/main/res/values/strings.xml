@@ -14,6 +14,10 @@
     <string name="hello_world">Hello world!</string>
     <!--End of login activity string values -->
 
+    <!--Top buttons string values -->
+    <string name="nearby_button_text_view">Nearby</string>
+    <string name="chat_button_text_view">Chat</string>
+    <string name="settings_button_text_view">Settings</string>
     <!--Main activity string values -->
     <string name="title_activity_messaging">MessagingActivity</string>
     <!-- End of main activity string values -->
