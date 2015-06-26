@@ -5,18 +5,6 @@
     android:layout_height="fill_parent"
     android:orientation="vertical" >
 
-    <Button
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/logout_button_text_view"
-        android:id="@+id/logoutButton"
-        android:gravity="center_vertical|center_horizontal"
-        android:layout_gravity="center_horizontal"
-        android:background="#ffb3b3b3"
-        android:textSize="24sp"
-        android:padding="15dp"
-        android:textColor="#ff63029d" />
-
     <ListView xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

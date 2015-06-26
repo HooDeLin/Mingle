@@ -15,12 +15,17 @@
     <!--End of login activity string values -->
 
     <!--Main activity string values -->
-    <string name="logout_button_text_view">Logout</string>
     <string name="title_activity_messaging">MessagingActivity</string>
     <!-- End of main activity string values -->
 
     <!-- Messaging activity string values -->
     <string name="message_elipses">Message...</string>
     <string name="title_activity_nearby">NearbyActivity</string>
+    <string name="title_activity_settings">SettingsActivity</string>
     <!-- End of messaging activity string values -->
+
+    <!-- Settings activity string values -->
+    <string name="update_profile_text_view">Update profile</string>
+    <string name="logout_button_text_view">Logout</string>
+    <!-- End of settings activity string values -->
 </resources>

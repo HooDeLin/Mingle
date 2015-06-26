@@ -36,6 +36,10 @@
             android:name=".NearbyActivity"
             android:label="@string/title_activity_nearby" >
         </activity>
+        <activity
+            android:name=".SettingsActivity"
+            android:label="@string/title_activity_settings" >
+        </activity>
     </application>
 
 </manifest>

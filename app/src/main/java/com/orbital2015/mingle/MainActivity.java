@@ -24,7 +24,6 @@ import java.util.List;
 public class MainActivity extends ActionBarActivity {
 
     private String currentUserID;
-    private Button logoutButton;
     private ArrayList<String> nameList;
     private ListView usersListView;
     private ArrayAdapter<String> namesArrayAdapter;
@@ -34,15 +33,6 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        logoutButton = (Button) findViewById(R.id.logoutButton);
-        logoutButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ParseUser.logOut();
-                Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-                startActivity(intent);
-            }
-        });
 
         currentUserID = ParseUser.getCurrentUser().getObjectId().toString();
         nameList = new ArrayList<String>();
