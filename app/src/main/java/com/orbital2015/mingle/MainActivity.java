@@ -22,7 +22,8 @@ import java.util.List;
 
 
 public class MainActivity extends ActionBarActivity {
-
+    private Button nearByButton;
+    private Button settingsButton;
     private String currentUserID;
     private ArrayList<String> nameList;
     private ListView usersListView;
@@ -33,6 +34,25 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        nearByButton = (Button) findViewById(R.id.nearbyButton);
+
+        nearByButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), NearbyActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        settingsButton = (Button) findViewById(R.id.settingsButton);
+
+        settingsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
+                startActivity(intent);
+            }
+        });
 
         currentUserID = ParseUser.getCurrentUser().getObjectId().toString();
         nameList = new ArrayList<String>();

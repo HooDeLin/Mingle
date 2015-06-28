@@ -1,6 +1,7 @@
 package com.orbital2015.mingle;
 
 
+import android.content.Intent;
 import android.location.Location;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -9,6 +10,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -33,6 +35,8 @@ import java.util.List;
 
 public class NearbyActivity extends ActionBarActivity implements ConnectionCallbacks, OnConnectionFailedListener {
     private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 1000;
+    private Button chatButton;
+    private Button settingsButton;
     private LocationRequest locationRequest = null;
     private GoogleApiClient locationClient = null;
     private Location currentLocation = null;
@@ -46,6 +50,25 @@ public class NearbyActivity extends ActionBarActivity implements ConnectionCallb
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_nearby);
 
+        chatButton = (Button) findViewById(R.id.chatButton);
+
+        chatButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        settingsButton = (Button) findViewById(R.id.settingsButton);
+
+        settingsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
+                startActivity(intent);
+            }
+        });
         if(servicesConnected()){
             buildGoogleApiClient();
         }
@@ -105,9 +128,6 @@ public class NearbyActivity extends ActionBarActivity implements ConnectionCallb
             @Override
             public void done(List<ParseObject> list, ParseException e) {
                 if (e == null) {
-                    Toast.makeText(getApplicationContext(),
-                            Integer.toString(list.size()),
-                            Toast.LENGTH_LONG).show();
                     for (int i = 0; i < list.size(); i++) {
                         names.add(list.get(i).get("userName").toString());
                     }

@@ -12,6 +12,8 @@ import com.parse.ParseUser;
 
 
 public class SettingsActivity extends ActionBarActivity {
+    private Button nearByButton;
+    private Button chatButton;
     private Button updateProfileButton;
     private Button logoutButton;
 
@@ -19,6 +21,26 @@ public class SettingsActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+
+        nearByButton = (Button) findViewById(R.id.nearbyButton);
+
+        nearByButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), NearbyActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        chatButton = (Button) findViewById(R.id.settingsButton);
+
+        chatButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                startActivity(intent);
+            }
+        });
 
         updateProfileButton = (Button) findViewById(R.id.updateProfileButton);
         logoutButton = (Button) findViewById(R.id.logoutButton);
