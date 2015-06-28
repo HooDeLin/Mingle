@@ -10,7 +10,7 @@
     <string name="login_password_edit_text_view">Password</string>
     <string name="login_button_text_view">Login</string>
     <string name="title_activity_main">MainActivity</string>
-
+    <string name="sign_up_button_text_view">Sign up</string>
     <string name="hello_world">Hello world!</string>
     <!--End of login activity string values -->
 

@@ -1,10 +1,7 @@
 package com.orbital2015.mingle;
 
-import android.app.Application;
-import android.app.Dialog;
-import android.app.DialogFragment;
+
 import android.location.Location;
-import android.location.LocationListener;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -18,23 +15,26 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
+import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.parse.FindCallback;
+import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
+import com.parse.ParseObject;
 import com.parse.ParseQuery;
-import com.parse.ParseQueryAdapter;
 import com.parse.ParseUser;
 
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class NearbyActivity extends ActionBarActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
-    private LocationRequest locationRequest;
-    private GoogleApiClient locationClient;
+public class NearbyActivity extends ActionBarActivity implements ConnectionCallbacks, OnConnectionFailedListener {
+    private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 1000;
+    private LocationRequest locationRequest = null;
+    private GoogleApiClient locationClient = null;
     private Location currentLocation = null;
     private String currentUserId;
     private ArrayList<String> names;
@@ -46,46 +46,11 @@ public class NearbyActivity extends ActionBarActivity implements GoogleApiClient
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_nearby);
 
-        locationRequest = LocationRequest.create();
-        locationClient = new GoogleApiClient.Builder(this)
-                .addApi(LocationServices.API)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .build();
+        if(servicesConnected()){
+            buildGoogleApiClient();
+        }
 
         currentUserId = ParseUser.getCurrentUser().getObjectId();
-        names = new ArrayList<String>();
-
-        ParseQuery<ParseUser> query = ParseUser.getQuery();
-        query.whereNotEqualTo("objectId", currentUserId);
-        query.whereNear("location", new ParseGeoPoint(currentLocation.getLatitude(), currentLocation.getLongitude()));
-
-        query.findInBackground(new FindCallback<ParseUser>() {
-            @Override
-            public void done(List<ParseUser> list, ParseException e) {
-                if(e == null){
-                    for(int i = 0; i < list.size(); i ++){
-                        names.add(list.get(i).getUsername().toString());
-                    }
-
-                    usersListView = (ListView) findViewById(R.id.usersListView);
-                    namesArrayAdapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.user_list_item, names);
-                    usersListView.setAdapter(namesArrayAdapter);
-
-                    usersListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                        @Override
-                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                            //open profile
-                        }
-                    });
-                } else {
-                    Toast.makeText(getApplicationContext(),
-                            "Error loading user list",
-                            Toast.LENGTH_LONG).show();
-                }
-            }
-        });
-
     }
 
     @Override
@@ -113,31 +78,81 @@ public class NearbyActivity extends ActionBarActivity implements GoogleApiClient
     @Override
     public void onConnected(Bundle bundle) {
         currentLocation = getLocation();
-        ParseUser.getCurrentUser().put("location", new ParseGeoPoint(currentLocation.getLatitude(), currentLocation.getLongitude()));
-        ParseUser.getCurrentUser().saveInBackground();
+
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("UserLocation");
+        query.whereEqualTo("userId", currentUserId);
+        query.getFirstInBackground(new GetCallback<ParseObject>() {
+            @Override
+            public void done(ParseObject parseObject, ParseException e) {
+                if(e == null) {
+                    parseObject.put("userLocation", new ParseGeoPoint(currentLocation.getLatitude(), currentLocation.getLongitude()));
+                    parseObject.saveInBackground();
+                } else {
+                    Toast.makeText(getApplicationContext(),
+                            "Some error just occur",
+                            Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+
+        names = new ArrayList<String>();
+
+        ParseQuery<ParseObject> nearbyQuery = ParseQuery.getQuery("UserLocation");
+        nearbyQuery.whereNotEqualTo("userId", currentUserId);
+        ParseGeoPoint currentGeoPoint = new ParseGeoPoint(currentLocation.getLatitude(), currentLocation.getLongitude());
+        nearbyQuery.whereWithinKilometers("userLocation", currentGeoPoint, 10);//dummy value
+        nearbyQuery.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> list, ParseException e) {
+                if (e == null) {
+                    Toast.makeText(getApplicationContext(),
+                            Integer.toString(list.size()),
+                            Toast.LENGTH_LONG).show();
+                    for (int i = 0; i < list.size(); i++) {
+                        names.add(list.get(i).get("userName").toString());
+                    }
+
+                    usersListView = (ListView) findViewById(R.id.usersListView);
+                    namesArrayAdapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.user_list_item, names);
+                    usersListView.setAdapter(namesArrayAdapter);
+
+                    usersListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                            //open profile
+                        }
+                    });
+                } else {
+                    Toast.makeText(getApplicationContext(),
+                            "Error loading user list",
+                            Toast.LENGTH_LONG).show();
+                }
+            }
+        });
     }
 
     @Override
     public void onConnectionSuspended(int i) {
-
     }
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
-
+        Toast.makeText(getApplicationContext(),
+                "Error getting location",
+                Toast.LENGTH_LONG).show();
     }
 
     @Override
     protected void onResume(){
         super.onResume();
-        //update location and list
     }
 
     @Override
     protected void onStart(){
         super.onStart();
-
-        locationClient.connect();
+        if(locationClient != null){
+            locationClient.connect();
+        }
     }
 
     @Override
@@ -147,8 +162,29 @@ public class NearbyActivity extends ActionBarActivity implements GoogleApiClient
     }
 
     private boolean servicesConnected(){
-        int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
-        return resultCode == ConnectionResult.SUCCESS;
+        int resultCode = GooglePlayServicesUtil
+                .isGooglePlayServicesAvailable(this);
+        if (resultCode != ConnectionResult.SUCCESS) {
+            if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
+                GooglePlayServicesUtil.getErrorDialog(resultCode, this,
+                        PLAY_SERVICES_RESOLUTION_REQUEST).show();
+            } else {
+                Toast.makeText(getApplicationContext(),
+                        "This device is not supported.", Toast.LENGTH_LONG)
+                        .show();
+                finish();
+            }
+            return false;
+        }
+        return true;
+    }
+
+    protected synchronized void buildGoogleApiClient(){
+        locationClient = new GoogleApiClient.Builder(this)
+                .addApi(LocationServices.API)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .build();
     }
 
     private Location getLocation(){

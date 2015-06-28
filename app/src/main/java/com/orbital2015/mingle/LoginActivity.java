@@ -13,6 +13,7 @@ import android.widget.Toast;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
+import com.parse.SignUpCallback;
 
 
 public class LoginActivity extends ActionBarActivity {
@@ -24,7 +25,7 @@ public class LoginActivity extends ActionBarActivity {
     private String m_password;
     private Intent intent;
     private Intent serviceIntent;
-
+    private Button signUpButton;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,7 +34,7 @@ public class LoginActivity extends ActionBarActivity {
         loginUsernameEditText = (EditText) findViewById(R.id.loginUsernameEditText);
         loginPasswordEditText = (EditText) findViewById(R.id.loginPasswordEditText);
         loginButton = (Button) findViewById(R.id.loginButton);
-        intent = new Intent(getApplicationContext(), MainActivity.class);
+        intent = new Intent(getApplicationContext(), NearbyActivity.class);
         serviceIntent = new Intent(getApplicationContext(), MessageService.class);
 
         ParseUser currentUser = ParseUser.getCurrentUser();
@@ -54,6 +55,9 @@ public class LoginActivity extends ActionBarActivity {
                         if(parseUser != null){
                             startService(serviceIntent);
                             startActivity(intent);
+                            Toast.makeText(getApplicationContext(),
+                                    "Logging in success!",
+                                    Toast.LENGTH_LONG).show();
                         } else {
                             Toast.makeText(getApplicationContext(),
                                     "There was an error logging in.",
@@ -63,10 +67,37 @@ public class LoginActivity extends ActionBarActivity {
                 });
             }
         });
+
+        signUpButton = (Button) findViewById(R.id.signUpButton);
+
+        signUpButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                m_username = loginUsernameEditText.getText().toString();
+                m_password = loginPasswordEditText.getText().toString();
+                ParseUser user = new ParseUser();
+                user.setUsername(m_username);
+                user.setPassword(m_password);
+
+                user.signUpInBackground(new SignUpCallback() {
+                    public void done(ParseException e) {
+                        if (e == null) {
+                            Toast.makeText(getApplicationContext(),
+                                    "Signing up success!",
+                                    Toast.LENGTH_LONG).show();
+                        } else {
+                            Toast.makeText(getApplicationContext(),
+                                    "There was an error signing in.",
+                                    Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+            }
+        });
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu (Menu menu){
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_login, menu);
         return true;
