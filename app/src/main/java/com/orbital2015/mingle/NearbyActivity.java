@@ -2,6 +2,7 @@ package com.orbital2015.mingle;
 
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -44,12 +45,17 @@ public class NearbyActivity extends ActionBarActivity implements ConnectionCallb
     private ArrayList<String> names;
     private ListView usersListView;
     private ArrayAdapter<String> namesArrayAdapter;
+    private SharedPreferences yourSettings;
+    private int currentRadius;
+    private int currentLimit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_nearby);
-
+        yourSettings = getApplicationContext().getSharedPreferences("MyPref", MODE_PRIVATE);
+        currentRadius = yourSettings.getInt("radius", 0);
+        currentLimit = yourSettings.getInt("limit", 0);
         chatButton = (Button) findViewById(R.id.chatButton);
 
         chatButton.setOnClickListener(new View.OnClickListener() {
@@ -123,7 +129,8 @@ public class NearbyActivity extends ActionBarActivity implements ConnectionCallb
         ParseQuery<ParseObject> nearbyQuery = ParseQuery.getQuery("UserLocation");
         nearbyQuery.whereNotEqualTo("userId", currentUserId);
         ParseGeoPoint currentGeoPoint = new ParseGeoPoint(currentLocation.getLatitude(), currentLocation.getLongitude());
-        nearbyQuery.whereWithinKilometers("userLocation", currentGeoPoint, 10);//dummy value
+        nearbyQuery.whereWithinKilometers("userLocation", currentGeoPoint, currentRadius);
+        nearbyQuery.setLimit(currentLimit);
         nearbyQuery.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> list, ParseException e) {

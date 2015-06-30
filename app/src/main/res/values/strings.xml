@@ -31,5 +31,13 @@
     <!-- Settings activity string values -->
     <string name="update_profile_text_view">Update profile</string>
     <string name="logout_button_text_view">Logout</string>
+    <string name="edit_search_button_text_view">Edit Search Settings</string>
+    <string name="title_activity_edit_search">EditSearchActivity</string>
     <!-- End of settings activity string values -->
+
+    <!-- Edit Search Activity string values -->
+    <string name="search_distance">Search Distance</string>
+    <string name="number_of_results">Number of Results</string>
+    <string name="edit_search_confirm_button_text_view">Confirm</string>
+    <!-- End of edit search activity string values -->
 </resources>

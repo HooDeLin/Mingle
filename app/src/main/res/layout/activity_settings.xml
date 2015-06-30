@@ -57,8 +57,8 @@
     <Button
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="@string/logout_button_text_view"
-        android:id="@+id/logoutButton"
+        android:text="@string/edit_search_button_text_view"
+        android:id="@+id/editSearchButton"
         android:gravity="center_vertical|center_horizontal"
         android:layout_gravity="center_horizontal"
         android:background="#ffb3b3b3"
@@ -68,6 +68,22 @@
         android:layout_below="@+id/updateProfileButton"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginTop="137dp" />
+        android:layout_marginTop="79dp" />
+
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/logout_button_text_view"
+        android:id="@+id/logoutButton"
+        android:gravity="center_vertical|center_horizontal"
+        android:layout_gravity="center_horizontal"
+        android:background="#ffb3b3b3"
+        android:textSize="24sp"
+        android:padding="15dp"
+        android:textColor="#ff63029d"
+        android:layout_marginTop="75dp"
+        android:layout_below="@+id/editSearchButton"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
 </RelativeLayout>

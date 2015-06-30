@@ -1,6 +1,7 @@
 package com.orbital2015.mingle;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -15,6 +16,7 @@ public class SettingsActivity extends ActionBarActivity {
     private Button nearByButton;
     private Button chatButton;
     private Button updateProfileButton;
+    private Button editSearchButton;
     private Button logoutButton;
 
     @Override
@@ -43,6 +45,7 @@ public class SettingsActivity extends ActionBarActivity {
         });
 
         updateProfileButton = (Button) findViewById(R.id.updateProfileButton);
+        editSearchButton = (Button) findViewById(R.id.editSearchButton);
         logoutButton = (Button) findViewById(R.id.logoutButton);
 
         updateProfileButton.setOnClickListener(new View.OnClickListener() {
@@ -52,9 +55,20 @@ public class SettingsActivity extends ActionBarActivity {
             }
         });
 
+        editSearchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), EditSearchActivity.class);
+                startActivity(intent);
+            }
+        });
         logoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                SharedPreferences pref = getApplicationContext().getSharedPreferences("MyPref", MODE_PRIVATE);
+                SharedPreferences.Editor editor = pref.edit();
+                editor.clear();
+                editor.commit();
                 ParseUser.logOut();
                 Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
                 startActivity(intent);

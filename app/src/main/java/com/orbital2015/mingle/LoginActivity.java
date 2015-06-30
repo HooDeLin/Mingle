@@ -1,6 +1,7 @@
 package com.orbital2015.mingle;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -53,6 +54,11 @@ public class LoginActivity extends ActionBarActivity {
                     @Override
                     public void done(ParseUser parseUser, ParseException e) {
                         if(parseUser != null){
+                            SharedPreferences pref = getApplicationContext().getSharedPreferences("MyPref", MODE_PRIVATE);
+                            SharedPreferences.Editor editor = pref.edit();
+                            editor.putInt("radius", 1);
+                            editor.putInt("limit", 20);
+                            editor.commit();
                             startService(serviceIntent);
                             startActivity(intent);
                             Toast.makeText(getApplicationContext(),
@@ -82,6 +88,11 @@ public class LoginActivity extends ActionBarActivity {
                 user.signUpInBackground(new SignUpCallback() {
                     public void done(ParseException e) {
                         if (e == null) {
+                            SharedPreferences pref = getApplicationContext().getSharedPreferences("MyPref", MODE_PRIVATE);
+                            SharedPreferences.Editor editor = pref.edit();
+                            editor.putInt("radius", 1);
+                            editor.putInt("limit", 20);
+                            editor.commit();
                             Toast.makeText(getApplicationContext(),
                                     "Signing up success!",
                                     Toast.LENGTH_LONG).show();
