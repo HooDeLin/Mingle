@@ -4,6 +4,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
+import android.util.Log;
 
 import com.parse.ParseUser;
 import com.sinch.android.rtc.ClientRegistration;
@@ -38,6 +39,14 @@ public class MessageService extends Service implements SinchClientListener{
 
     public void startSinchClient(String username){
         sinchClient = Sinch.getSinchClientBuilder().context(this).userId(username).applicationKey(APP_KEY).applicationSecret(APP_SECRET).environmentHost(ENVIRONMENT).build();
+
+        sinchClient.addSinchClientListener(this);
+
+        sinchClient.setSupportMessaging(true);
+        sinchClient.setSupportActiveConnectionInBackground(true);
+
+        sinchClient.checkManifest();
+        sinchClient.start();
     }
 
     private boolean isSinchClientStarted(){
@@ -96,7 +105,7 @@ public class MessageService extends Service implements SinchClientListener{
 
     @Override
     public void onDestroy(){
-        sinchClient.startListeningOnActiveConnection();
+        sinchClient.stopListeningOnActiveConnection();
         sinchClient.terminate();
     }
 

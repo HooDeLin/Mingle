@@ -37,6 +37,7 @@ public class MessagingActivity extends ActionBarActivity {
     private MessageService.MessageServiceInterface messageService;
     private String currentUserId;
     private ServiceConnection serviceConnection = new MyServiceConnection();
+    private MessageClientListener messageClientListener = new MyMessageClientListener();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,16 +62,20 @@ public class MessagingActivity extends ActionBarActivity {
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                messageBody = messageBodyField.getText().toString();
-                if(messageBody.isEmpty()){
-                    Toast.makeText(getApplicationContext(), "Please enter a message", Toast.LENGTH_LONG).show();
-                    return;
-                }
-
-                messageService.sendMessage(recipientId, messageBody);
-                messageBodyField.setText("");
+                sendMessage();
             }
         });
+    }
+
+    private void sendMessage(){
+        messageBody = messageBodyField.getText().toString();
+        if(messageBody.isEmpty()){
+            Toast.makeText(this, "Please enter a message", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        messageService.sendMessage(recipientId, messageBody);
+        messageBodyField.setText("");
     }
 
     @Override
@@ -97,6 +102,7 @@ public class MessagingActivity extends ActionBarActivity {
 
     @Override
     public void onDestroy(){
+        messageService.removeMessageClientListener(messageClientListener);
         unbindService(serviceConnection);
         super.onDestroy();
     }
@@ -106,6 +112,7 @@ public class MessagingActivity extends ActionBarActivity {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             messageService = (MessageService.MessageServiceInterface) service;
+            messageService.addMessageClientListener(messageClientListener);
         }
 
         @Override
