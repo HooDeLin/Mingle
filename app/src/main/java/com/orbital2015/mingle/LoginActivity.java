@@ -9,6 +9,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.parse.LogInCallback;
@@ -105,6 +106,41 @@ public class LoginActivity extends ActionBarActivity {
                 });
             }
         });
+    }
+
+    @Override
+    protected void onStart(){
+        ParseUser currentUser = ParseUser.getCurrentUser();
+        if(currentUser != null){
+            TextView loginUsernameTextView = (TextView) findViewById(R.id.loginUsernameText);
+            TextView loginPasswordTextView = (TextView) findViewById(R.id.loginPasswordText);
+
+            loginUsernameTextView.setVisibility(View.GONE);
+            loginPasswordTextView.setVisibility(View.GONE);
+
+            loginUsernameEditText = (EditText) findViewById(R.id.loginUsernameEditText);
+            loginPasswordEditText = (EditText) findViewById(R.id.loginPasswordEditText);
+
+            loginPasswordEditText.setVisibility(View.GONE);
+            loginUsernameEditText.setVisibility(View.GONE);
+
+            loginButton = (Button) findViewById(R.id.loginButton);
+            signUpButton = (Button) findViewById(R.id.signUpButton);
+
+            loginButton.setVisibility(View.GONE);
+            signUpButton.setVisibility(View.GONE);
+
+            TextView loggedInAs = (TextView) findViewById(R.id.loggedInTextView);
+            loggedInAs.setVisibility(View.VISIBLE);
+            loggedInAs.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ParseUser.logOut();
+                    Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                    startActivity(intent);
+                }
+            });
+        }
     }
 
     @Override
