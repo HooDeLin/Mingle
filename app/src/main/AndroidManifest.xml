@@ -52,6 +52,10 @@
             android:name=".UpdateProfileActivity"
             android:label="@string/title_activity_update_profile" >
         </activity>
+        <activity
+            android:name=".SignUpActivity"
+            android:label="@string/title_activity_sign_up" >
+        </activity>
     </application>
 
 </manifest>

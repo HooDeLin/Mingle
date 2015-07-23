@@ -27,7 +27,7 @@ public class LoginActivity extends ActionBarActivity {
     private String m_password;
     private Intent intent;
     private Intent serviceIntent;
-    private Button signUpButton;
+    private TextView signUpLink;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,6 +38,7 @@ public class LoginActivity extends ActionBarActivity {
         loginButton = (Button) findViewById(R.id.loginButton);
         intent = new Intent(getApplicationContext(), NearbyActivity.class);
         serviceIntent = new Intent(getApplicationContext(), MessageService.class);
+        signUpLink = (TextView) findViewById(R.id.signUpLink);
 
         ParseUser currentUser = ParseUser.getCurrentUser();
 
@@ -54,7 +55,7 @@ public class LoginActivity extends ActionBarActivity {
                 ParseUser.logInInBackground(m_username, m_password, new LogInCallback() {
                     @Override
                     public void done(ParseUser parseUser, ParseException e) {
-                        if(parseUser != null){
+                        if (parseUser != null) {
                             SharedPreferences pref = getApplicationContext().getSharedPreferences("MyPref", MODE_PRIVATE);
                             SharedPreferences.Editor editor = pref.edit();
                             editor.putInt("radius", 1);
@@ -75,35 +76,11 @@ public class LoginActivity extends ActionBarActivity {
             }
         });
 
-        signUpButton = (Button) findViewById(R.id.signUpButton);
-
-        signUpButton.setOnClickListener(new View.OnClickListener() {
+        signUpLink.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                m_username = loginUsernameEditText.getText().toString();
-                m_password = loginPasswordEditText.getText().toString();
-                ParseUser user = new ParseUser();
-                user.setUsername(m_username);
-                user.setPassword(m_password);
-
-                user.signUpInBackground(new SignUpCallback() {
-                    public void done(ParseException e) {
-                        if (e == null) {
-                            SharedPreferences pref = getApplicationContext().getSharedPreferences("MyPref", MODE_PRIVATE);
-                            SharedPreferences.Editor editor = pref.edit();
-                            editor.putInt("radius", 1);
-                            editor.putInt("limit", 20);
-                            editor.commit();
-                            Toast.makeText(getApplicationContext(),
-                                    "Signing up success!",
-                                    Toast.LENGTH_LONG).show();
-                        } else {
-                            Toast.makeText(getApplicationContext(),
-                                    "There was an error signing in.",
-                                    Toast.LENGTH_LONG).show();
-                        }
-                    }
-                });
+                Intent intent = new Intent(getApplicationContext(), SignUpActivity.class);
+                startActivity(intent);
             }
         });
     }
@@ -125,10 +102,8 @@ public class LoginActivity extends ActionBarActivity {
             loginUsernameEditText.setVisibility(View.GONE);
 
             loginButton = (Button) findViewById(R.id.loginButton);
-            signUpButton = (Button) findViewById(R.id.signUpButton);
 
             loginButton.setVisibility(View.GONE);
-            signUpButton.setVisibility(View.GONE);
 
             TextView loggedInAs = (TextView) findViewById(R.id.loggedInTextView);
             loggedInAs.setVisibility(View.VISIBLE);

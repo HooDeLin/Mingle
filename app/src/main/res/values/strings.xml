@@ -10,9 +10,9 @@
     <string name="login_password_edit_text_view">Password</string>
     <string name="login_button_text_view">Login</string>
     <string name="title_activity_main">MainActivity</string>
-    <string name="sign_up_button_text_view">Sign up</string>
     <string name="hello_world">Hello world!</string>
     <string name="logged_in_text_view">Logged in as ... . Sign out?</string>
+    <string name="sign_up_link">Don't have an account yet? Click here to sign up!</string>
     <!--End of login activity string values -->
 
     <!--Top buttons string values -->
@@ -55,4 +55,13 @@
     <string name="description_text_view">Description</string>
     <string name="save_profile_button_text_view">Save</string>
     <string name="date_input_hint">DD/MM/YYYY</string>
+    <string name="title_activity_sign_up">SignUpActivity</string>
+    <!-- End of update profile activity string values -->
+
+    <!-- Sign up Activity string values -->
+    <string name="sign_up_username_text_view">Username</string>
+    <string name="sign_up_password_text_view">Password</string>
+    <string name="sign_up_confirm_password_text_view">Confirm Password</string>
+    <string name="sign_up_button_text_view">Sign up</string>
+    <!-- End of sign up activity string values -->
 </resources>
