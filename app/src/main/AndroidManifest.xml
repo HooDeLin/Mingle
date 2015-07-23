@@ -48,6 +48,10 @@
             android:name=".EditSearchActivity"
             android:label="@string/title_activity_edit_search" >
         </activity>
+        <activity
+            android:name=".UpdateProfileActivity"
+            android:label="@string/title_activity_update_profile" >
+        </activity>
     </application>
 
 </manifest>

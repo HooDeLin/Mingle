@@ -40,5 +40,19 @@
     <string name="search_distance">Search Distance</string>
     <string name="number_of_results">Number of Results</string>
     <string name="edit_search_confirm_button_text_view">Confirm</string>
+    <string name="title_activity_update_profile">UpdateProfileActivity</string>
     <!-- End of edit search activity string values -->
+
+    <!-- Update Profile Activity string values -->
+    <string name="name_text_view">Name</string>
+    <string name="date_of_birth_text_view">Date of Birth</string>
+    <string name="nationality_text_view">Nationality</string>
+    <string name="set_profile_picture_button_text_view">Set profile picture</string>
+    <string name="gender_text_view">Gender</string>
+    <string name="male_radio_text_view">Male</string>
+    <string name="female_radio_text_view">Female</string>
+    <string name="other_gender_radio_text_view">Others</string>
+    <string name="description_text_view">Description</string>
+    <string name="save_profile_button_text_view">Save</string>
+    <string name="date_input_hint">DD/MM/YYYY</string>
 </resources>
