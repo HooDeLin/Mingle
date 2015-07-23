@@ -116,7 +116,7 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="@string/description_text_view"
-        android:id="@+id/textView4"
+        android:id="@+id/desc"
         android:layout_below="@+id/genderRadioGroup"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
@@ -126,8 +126,8 @@
         android:layout_height="wrap_content"
         android:inputType="textMultiLine"
         android:ems="10"
-        android:id="@+id/editText3"
-        android:layout_below="@+id/textView4"
+        android:id="@+id/descriptionEditText"
+        android:layout_below="@+id/desc"
         android:layout_alignRight="@+id/nameEditText"
         android:layout_alignEnd="@+id/nameEditText"
         android:layout_marginTop="27dp"
@@ -138,10 +138,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/save_profile_button_text_view"
-        android:id="@+id/button2"
+        android:id="@+id/saveUpdateProfileButton"
         android:layout_alignParentBottom="true"
-        android:layout_toRightOf="@+id/textView4"
-        android:layout_toEndOf="@+id/textView4"
+        android:layout_toRightOf="@+id/desc"
+        android:layout_toEndOf="@+id/desc"
         android:layout_marginBottom="28dp" />
 
     <EditText
@@ -150,7 +150,7 @@
         android:inputType="date"
         android:hint="@string/date_input_hint"
         android:ems="10"
-        android:id="@+id/editText4"
+        android:id="@+id/dateOfBirthEditText"
         android:layout_below="@+id/dateOfBirthTextView"
         android:layout_toRightOf="@+id/setProfilePictureButton"
         android:layout_toEndOf="@+id/setProfilePictureButton" />
@@ -164,7 +164,7 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:layout_alignBottom="@+id/editText4" />
+        android:layout_alignBottom="@+id/dateOfBirthEditText" />
 
 
 </RelativeLayout>
