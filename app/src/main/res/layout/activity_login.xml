@@ -78,6 +78,16 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="@string/back_main_page_text_view"
+        android:id="@+id/backToMainPage"
+        android:layout_below="@+id/loggedInTextView"
+        android:layout_alignRight="@+id/loginPasswordEditText"
+        android:layout_alignEnd="@+id/loginPasswordEditText"
+        android:visibility="gone"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:text="@string/sign_up_link"
         android:id="@+id/signUpLink"

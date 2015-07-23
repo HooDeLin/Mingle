@@ -2,6 +2,7 @@ package com.orbital2015.mingle;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.location.Location;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -12,6 +13,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.parse.ParseException;
+import com.parse.ParseObject;
 import com.parse.ParseUser;
 import com.parse.SignUpCallback;
 
@@ -36,7 +38,7 @@ public class SignUpActivity extends ActionBarActivity {
         signUpButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String username = signUpUserNameEditText.getText().toString();
+                final String username = signUpUserNameEditText.getText().toString();
                 String password = signUpPasswordEditText.getText().toString();
                 String confirmPassword = signUpConfirmPasswordEditText.getText().toString();
                 if(!password.equals(confirmPassword)){
@@ -57,8 +59,20 @@ public class SignUpActivity extends ActionBarActivity {
                                 editor.putInt("limit", 20);
                                 editor.commit();
                                 Toast.makeText(getApplicationContext(),
-                                        "Signing up success! Please login again.",
+                                        "Signing up success!",
                                         Toast.LENGTH_LONG).show();
+
+                                String currentUserId = ParseUser.getCurrentUser().getObjectId().toString();
+                                ParseObject userLocation = new ParseObject("UserLocation");
+                                userLocation.put("userId", currentUserId);
+                                userLocation.put("userName", username);
+                                userLocation.saveInBackground();
+
+                                ParseObject userProfileCredentials = new ParseObject("ProfileCredentials");
+                                userProfileCredentials.put("userName", username);
+                                userProfileCredentials.put("userId", currentUserId);
+                                userProfileCredentials.saveInBackground();
+
                                 Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
                                 startActivity(intent);
                             } else {

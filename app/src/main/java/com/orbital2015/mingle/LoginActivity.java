@@ -87,6 +87,7 @@ public class LoginActivity extends ActionBarActivity {
 
     @Override
     protected void onStart(){
+        super.onStart();
         ParseUser currentUser = ParseUser.getCurrentUser();
         if(currentUser != null){
             TextView loginUsernameTextView = (TextView) findViewById(R.id.loginUsernameText);
@@ -100,18 +101,31 @@ public class LoginActivity extends ActionBarActivity {
 
             loginPasswordEditText.setVisibility(View.GONE);
             loginUsernameEditText.setVisibility(View.GONE);
+            signUpLink.setVisibility(View.GONE);
 
             loginButton = (Button) findViewById(R.id.loginButton);
 
             loginButton.setVisibility(View.GONE);
 
             TextView loggedInAs = (TextView) findViewById(R.id.loggedInTextView);
+            String loggedInAsString = "Logged in as " + currentUser.getUsername() + ". Sign out? ";
+            loggedInAs.setText(loggedInAsString);
             loggedInAs.setVisibility(View.VISIBLE);
             loggedInAs.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     ParseUser.logOut();
                     Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                    startActivity(intent);
+                }
+            });
+
+            TextView backToMain = (TextView) findViewById(R.id.backToMainPage);
+            backToMain.setVisibility(View.VISIBLE);
+            backToMain.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(getApplicationContext(), NearbyActivity.class);
                     startActivity(intent);
                 }
             });

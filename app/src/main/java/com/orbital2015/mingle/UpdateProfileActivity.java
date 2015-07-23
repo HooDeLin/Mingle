@@ -54,7 +54,7 @@ public class UpdateProfileActivity extends ActionBarActivity {
         femaleRadio = (RadioButton) findViewById(R.id.femaleRadioButton);
         otherGenderRadio = (RadioButton) findViewById(R.id.otherGenderRadioButton);
 
-        String currentUserId = ParseUser.getCurrentUser().getObjectId();
+        final String currentUserId = ParseUser.getCurrentUser().getObjectId();
 
         ParseQuery<ParseObject> profileCredentialsQuery = ParseQuery.getQuery("ProfileCredentials");
         profileCredentialsQuery.whereEqualTo("userId", currentUserId);
