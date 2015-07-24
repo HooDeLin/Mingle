@@ -42,7 +42,7 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="@string/nationality_text_view"
-        android:id="@+id/textView2"
+        android:id="@+id/viewProfileNationalityTextView"
         android:layout_marginTop="84dp"
         android:layout_below="@+id/dateOfBirthTextView"
         android:layout_alignParentLeft="true"
@@ -76,7 +76,7 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="@string/gender_text_view"
-        android:id="@+id/genderTextView"
+        android:id="@+id/viewProfileGenderTextView"
         android:layout_below="@+id/nationalityEditText"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
@@ -85,7 +85,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_below="@+id/genderTextView"
+        android:layout_below="@+id/viewProfileGenderTextView"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:id="@+id/genderRadioGroup">
@@ -116,7 +116,7 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="@string/description_text_view"
-        android:id="@+id/desc"
+        android:id="@+id/viewProfileDescriptionTextView"
         android:layout_below="@+id/genderRadioGroup"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
@@ -127,7 +127,7 @@
         android:inputType="textMultiLine"
         android:ems="10"
         android:id="@+id/descriptionEditText"
-        android:layout_below="@+id/desc"
+        android:layout_below="@+id/viewProfileDescriptionTextView"
         android:layout_alignRight="@+id/nameEditText"
         android:layout_alignEnd="@+id/nameEditText"
         android:layout_marginTop="27dp"
@@ -140,8 +140,8 @@
         android:text="@string/save_profile_button_text_view"
         android:id="@+id/saveUpdateProfileButton"
         android:layout_alignParentBottom="true"
-        android:layout_toRightOf="@+id/desc"
-        android:layout_toEndOf="@+id/desc"
+        android:layout_toRightOf="@+id/viewProfileDescriptionTextView"
+        android:layout_toEndOf="@+id/viewProfileDescriptionTextView"
         android:layout_marginBottom="28dp" />
 
     <EditText

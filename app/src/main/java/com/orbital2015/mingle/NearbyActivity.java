@@ -146,13 +146,31 @@ public class NearbyActivity extends ActionBarActivity implements ConnectionCallb
                     usersListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                         @Override
                         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                            //open profile
+                            openProfile(names, position);
                         }
                     });
                 } else {
                     Toast.makeText(getApplicationContext(),
                             "Error loading user list",
                             Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+    }
+
+    private void openProfile(ArrayList<String> names, int position){
+        ParseQuery<ParseUser> query = ParseUser.getQuery();
+        query.whereEqualTo("username", names.get(position));
+        query.findInBackground(new FindCallback<ParseUser>() {
+            public void done(List<ParseUser> user, ParseException e) {
+                if (e == null) {
+                    Intent intent = new Intent(getApplicationContext(), ViewProfileActivity.class);
+                    intent.putExtra("NEARBY_ID", user.get(0).getObjectId());
+                    startActivity(intent);
+                } else {
+                    Toast.makeText(getApplicationContext(),
+                            "Error finding that user",
+                            Toast.LENGTH_SHORT).show();
                 }
             }
         });

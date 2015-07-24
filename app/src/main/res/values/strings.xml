@@ -64,5 +64,16 @@
     <string name="sign_up_password_text_view">Password</string>
     <string name="sign_up_confirm_password_text_view">Confirm Password</string>
     <string name="sign_up_button_text_view">Sign up</string>
+
     <!-- End of sign up activity string values -->
+
+    <!-- View Profile Activity string values -->
+    <string name="title_activity_view_profile">ViewProfileActivity</string>
+    <string name="view_profile_chat_button_text_view">Chat</string>
+    <string name="target_name_text_view">No Name Available</string>
+    <string name="target_gender_text_view">No Gender Available</string>
+    <string name="target_date_of_birth_text_view">No Date Of Birth Available</string>
+    <string name="target_nationality_text_view">No Nationality Available</string>
+    <string name="target_description_text_view">No Description Available</string>
+    <!-- End of view profile activity string values -->
 </resources>

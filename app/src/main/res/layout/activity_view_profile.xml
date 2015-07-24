@@ -1,0 +1,136 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    tools:context="com.orbital2015.mingle.ViewProfileActivity">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/name_text_view"
+        android:id="@+id/viewProfileNameTextView"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/date_of_birth_text_view"
+        android:id="@+id/viewProfileDateOfBirthTextView"
+        android:layout_below="@+id/targetGenderTextView"
+        android:layout_alignLeft="@+id/targetGenderTextView"
+        android:layout_alignStart="@+id/targetGenderTextView"
+        android:layout_marginTop="31dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/nationality_text_view"
+        android:id="@+id/viewProfileNationalityTextView"
+        android:layout_centerVertical="true"
+        android:layout_alignLeft="@+id/dateOfBirthTextView"
+        android:layout_alignStart="@+id/dateOfBirthTextView" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/gender_text_view"
+        android:id="@+id/viewProfileGenderTextView"
+        android:layout_marginTop="36dp"
+        android:layout_below="@+id/targetNameTextView"
+        android:layout_alignLeft="@+id/targetNameTextView"
+        android:layout_alignStart="@+id/targetNameTextView" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/description_text_view"
+        android:id="@+id/viewProfileDescriptionTextView"
+        android:layout_below="@+id/viewProfileNationalityTextView"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="42dp" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/viewProfilePictureImageView"
+        android:src="@mipmap/ic_launcher"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_toLeftOf="@+id/viewProfileNameTextView"
+        android:layout_toStartOf="@+id/viewProfileNameTextView"
+        android:layout_above="@+id/viewProfileDateOfBirthTextView"
+        android:layout_alignParentTop="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/target_description_text_view"
+        android:id="@+id/targetDescriptionTextView"
+        android:layout_below="@+id/viewProfileDescriptionTextView"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="29dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/target_gender_text_view"
+        android:id="@+id/targetGenderTextView"
+        android:layout_below="@+id/viewProfileGenderTextView"
+        android:layout_alignLeft="@+id/viewProfileGenderTextView"
+        android:layout_alignStart="@+id/viewProfileGenderTextView" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/target_name_text_view"
+        android:id="@+id/targetNameTextView"
+        android:layout_below="@+id/viewProfileNameTextView"
+        android:layout_alignLeft="@+id/viewProfileNameTextView"
+        android:layout_alignStart="@+id/viewProfileNameTextView" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/target_nationality_text_view"
+        android:id="@+id/targetNationalityTextView"
+        android:layout_below="@+id/viewProfileNationalityTextView"
+        android:layout_alignLeft="@+id/viewProfileNationalityTextView"
+        android:layout_alignStart="@+id/viewProfileNationalityTextView" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/view_profile_chat_button_text_view"
+        android:id="@+id/viewProfileChatButton"
+        android:layout_alignParentBottom="true"
+        android:layout_toRightOf="@+id/viewProfileDescriptionTextView"
+        android:layout_toEndOf="@+id/viewProfileDescriptionTextView"
+        android:layout_marginBottom="35dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/target_date_of_birth_text_view"
+        android:id="@+id/targetDateOfBirthTextView"
+        android:layout_below="@+id/viewProfileDateOfBirthTextView"
+        android:layout_alignLeft="@+id/viewProfileDateOfBirthTextView"
+        android:layout_alignStart="@+id/viewProfileDateOfBirthTextView" />
+
+</RelativeLayout>
