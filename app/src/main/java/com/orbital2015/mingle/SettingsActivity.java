@@ -51,7 +51,8 @@ public class SettingsActivity extends ActionBarActivity {
         updateProfileButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //open update profile activity
+                Intent intent = new Intent(getApplicationContext(), UpdateProfileActivity.class);
+                startActivity(intent);
             }
         });
 

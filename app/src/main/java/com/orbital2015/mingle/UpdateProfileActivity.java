@@ -11,11 +11,13 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.Toast;
 
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
+import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
@@ -69,13 +71,16 @@ public class UpdateProfileActivity extends ActionBarActivity {
                     dateOfBirthEditText.setText(queryRow.getString("dateOfBirth"));
 
                     String currentGender = queryRow.getString("Gender");
-                    if (currentGender.equals("Male")) {
-                        maleRadio.toggle();
-                    } else if (currentGender.equals("Female")) {
-                        femaleRadio.toggle();
-                    } else if (currentGender.equals("Others")) {
-                        otherGenderRadio.toggle();
+                    if (currentGender != null) {
+                        if (currentGender.equals("Male")) {
+                            maleRadio.toggle();
+                        } else if (currentGender.equals("Female")) {
+                            femaleRadio.toggle();
+                        } else if (currentGender.equals("Others")) {
+                            otherGenderRadio.toggle();
+                        }
                     }
+
                 } else {
                     //something is wrong
                 }
@@ -85,11 +90,12 @@ public class UpdateProfileActivity extends ActionBarActivity {
         saveUpdateProfileButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ParseQuery queryRow = ParseQuery.getQuery("ProfileCredentials");
-                queryRow.getInBackground(currentUserId, new GetCallback() {
+                ParseQuery<ParseObject> query = ParseQuery.getQuery("ProfileCredentials");
+                query.whereEqualTo("userId", currentUserId);
+                query.getFirstInBackground(new GetCallback<ParseObject>() {
                     @Override
                     public void done(ParseObject parseObject, ParseException e) {
-                        if (e == null) {
+                        if(e == null) {
                             parseObject.put("userName", nameEditText.getText().toString());
                             parseObject.put("Nationality", nationalityEditText.getText().toString());
                             parseObject.put("Description", description.getText().toString());
@@ -97,25 +103,25 @@ public class UpdateProfileActivity extends ActionBarActivity {
 
                             if(maleRadio.isChecked()){
                                 parseObject.put("Gender", "Male");
-                            } else if(femaleRadio.isChecked()){
+                            }else if(femaleRadio.isChecked()){
                                 parseObject.put("Gender", "Female");
-                            } else if(otherGenderRadio.isChecked()){
+                            }else if(otherGenderRadio.isChecked()){
                                 parseObject.put("Gender", "Others");
                             }
 
+                            parseObject.saveInBackground();
+
                             Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
                             startActivity(intent);
+                        } else {
+                            Toast.makeText(getApplicationContext(),
+                                    "Some error just occur",
+                                    Toast.LENGTH_LONG).show();
                         }
-                    }
-
-                    @Override
-                    public void done(Object o, Throwable throwable) {
-
                     }
                 });
             }
         });
-
     }
 
     @Override
