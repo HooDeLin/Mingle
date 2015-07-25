@@ -3,6 +3,8 @@ package com.orbital2015.mingle;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -24,12 +26,15 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
+import com.parse.GetDataCallback;
 import com.parse.ParseException;
+import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,12 +47,13 @@ public class NearbyActivity extends ActionBarActivity implements ConnectionCallb
     private GoogleApiClient locationClient = null;
     private Location currentLocation = null;
     private String currentUserId;
-    private ArrayList<String> names;
+    private ArrayList<UserListItem> userListItems;
     private ListView usersListView;
     private ArrayAdapter<String> namesArrayAdapter;
     private SharedPreferences yourSettings;
     private int currentRadius;
     private int currentLimit;
+    private Bitmap bitPicture;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -124,7 +130,7 @@ public class NearbyActivity extends ActionBarActivity implements ConnectionCallb
             }
         });
 
-        names = new ArrayList<String>();
+        userListItems = new ArrayList<UserListItem>();
 
         ParseQuery<ParseObject> nearbyQuery = ParseQuery.getQuery("UserLocation");
         nearbyQuery.whereNotEqualTo("userId", currentUserId);
@@ -136,17 +142,50 @@ public class NearbyActivity extends ActionBarActivity implements ConnectionCallb
             public void done(List<ParseObject> list, ParseException e) {
                 if (e == null) {
                     for (int i = 0; i < list.size(); i++) {
-                        names.add(list.get(i).get("userName").toString());
+                        UserListItem currentUserListItem;
+                        ParseObject currentParseObject = list.get(i);
+                        String currentParseObjectUserId = currentParseObject.getString("userId");
+
+                        ParseQuery<ParseObject> profilePicQuery = ParseQuery.getQuery("ProfileCredentials");
+                        profilePicQuery.whereEqualTo("userId", currentParseObjectUserId);
+                        profilePicQuery.getFirstInBackground(new GetCallback<ParseObject>() {
+                            @Override
+                            public void done(ParseObject parseObject, ParseException e) {
+                                if (e == null) {
+                                    ParseFile profilePicture = parseObject.getParseFile("profilePicture");
+                                    if (profilePicture == null) {
+                                        bitPicture = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
+                                    } else {
+                                        profilePicture.getDataInBackground(new GetDataCallback() {
+                                            @Override
+                                            public void done(byte[] bytes, ParseException e) {
+                                                bitPicture = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                                                Toast.makeText(getApplicationContext(),
+                                                        "Found picture",
+                                                        Toast.LENGTH_LONG).show();
+                                            }
+                                        });
+                                    }
+                                } else {
+                                    Toast.makeText(getApplicationContext(),
+                                            "Some error just occur",
+                                            Toast.LENGTH_LONG).show();
+                                }
+                            }
+                        });
+                        currentUserListItem = new UserListItem(currentParseObject.getString("userName"), bitPicture);
+                        userListItems.add(currentUserListItem);
                     }
 
+                    UserListItemAdapter userListItemAdapter = new UserListItemAdapter(getApplicationContext(), userListItems);
+
                     usersListView = (ListView) findViewById(R.id.usersListView);
-                    namesArrayAdapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.user_list_item, names);
-                    usersListView.setAdapter(namesArrayAdapter);
+                    usersListView.setAdapter(userListItemAdapter);
 
                     usersListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                         @Override
                         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                            openProfile(names, position);
+                            openProfile(userListItems, position);
                         }
                     });
                 } else {
@@ -158,9 +197,9 @@ public class NearbyActivity extends ActionBarActivity implements ConnectionCallb
         });
     }
 
-    private void openProfile(ArrayList<String> names, int position){
+    private void openProfile(ArrayList<UserListItem> userListItems, int position){
         ParseQuery<ParseUser> query = ParseUser.getQuery();
-        query.whereEqualTo("username", names.get(position));
+        query.whereEqualTo("username", userListItems.get(position).getMemberName());
         query.findInBackground(new FindCallback<ParseUser>() {
             public void done(List<ParseUser> user, ParseException e) {
                 if (e == null) {
