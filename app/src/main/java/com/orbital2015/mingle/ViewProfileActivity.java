@@ -106,7 +106,9 @@ public class ViewProfileActivity extends ActionBarActivity {
         viewProfileChatButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //open messaging activity
+                Intent intent = new Intent(getApplicationContext(), MessagingActivity.class);
+                intent.putExtra("RECIPIENT_ID", nearbyId);
+                startActivity(intent);
             }
         });
 
