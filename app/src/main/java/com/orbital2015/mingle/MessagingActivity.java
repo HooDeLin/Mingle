@@ -174,6 +174,8 @@ public class MessagingActivity extends ActionBarActivity {
                     }
                 }
             });
+
+
         }
 
         @Override

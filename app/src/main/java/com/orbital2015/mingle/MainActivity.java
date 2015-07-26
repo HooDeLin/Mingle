@@ -23,6 +23,7 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,6 +45,7 @@ public class MainActivity extends ActionBarActivity {
 
         noPreviousChatTextView = (TextView) findViewById(R.id.noPreviousChatTextView);
         nearByButton = (Button) findViewById(R.id.nearbyButton);
+        usersListView = (ListView) findViewById(R.id.usersListView);
 
         nearByButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -66,53 +68,57 @@ public class MainActivity extends ActionBarActivity {
         currentUserID = ParseUser.getCurrentUser().getObjectId().toString();
         userListItems = new ArrayList<UserListItem>();
 
-        ParseQuery<ParseUser> query = ParseUser.getQuery();
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("ProfileCredentials");
+        query.whereEqualTo("userId", currentUserID);
 
-        query.whereNotEqualTo("objectId", currentUserID);
-        try{
-            List<ParseUser> userList = query.find();
+        try {
+            ParseObject parseObject = query.getFirst();
+            List<String> chatHistory = new ArrayList<String>();
+            chatHistory = parseObject.getList("ChatHistory");
 
-            for(int i = 0; i < userList.size(); i ++) {
-                UserListItem currentUserListItem;
-                ParseUser currentParseUser = userList.get(i);
-                String currentParseObjectUserId = currentParseUser.getObjectId().toString();
-
-                ParseQuery<ParseObject> profilePicQuery = ParseQuery.getQuery("ProfileCredentials");
-                profilePicQuery.whereEqualTo("userId", currentParseObjectUserId);
-
-                ParseObject profilePicObject = profilePicQuery.getFirst();
-                ParseFile profilePicture = profilePicObject.getParseFile("profilePicture");
-                if (profilePicture == null) {
-                    bitPicture = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
-                } else {
-                    byte[] bytes = profilePicture.getData();
-                    bitPicture = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                }
-
-                currentUserListItem = new UserListItem(currentParseUser.getUsername(), bitPicture);
-                userListItems.add(currentUserListItem);
-            }
-
-
-            UserListItemAdapter userListItemAdapter = new UserListItemAdapter(getApplicationContext(), userListItems);
-
-            usersListView = (ListView) findViewById(R.id.usersListView);
-            usersListView.setAdapter(userListItemAdapter);
-
-            usersListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    openConversation(userListItems, position);
-                }
-            });
-
-            if(userList.size() == 0){
+            if(chatHistory.size() == 0){
+                Toast.makeText(getApplicationContext(),
+                        "Over here",
+                        Toast.LENGTH_LONG).show();
                 usersListView.setVisibility(View.GONE);
                 noPreviousChatTextView.setVisibility(View.VISIBLE);
+            } else {
+                for(int i = 0; i < chatHistory.size(); i ++){
+                    UserListItem currentUserListItem;
+                    String currentParseObjectUserId = chatHistory.get(i);
+
+                    ParseQuery<ParseObject> profilePicQuery = ParseQuery.getQuery("ProfileCredentials");
+                    profilePicQuery.whereEqualTo("userId", currentParseObjectUserId);
+
+                    ParseObject profilePicObject = profilePicQuery.getFirst();
+                    ParseFile profilePicture = profilePicObject.getParseFile("profilePicture");
+                    if (profilePicture == null) {
+                        bitPicture = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
+                    } else {
+                        byte[] bytes = profilePicture.getData();
+                        bitPicture = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                    }
+                    ParseQuery<ParseObject> userNameQuery = ParseQuery.getQuery("ProfileCredentials");
+                    userNameQuery.whereEqualTo("userId", currentParseObjectUserId);
+                    String currentName = userNameQuery.getFirst().getString("userName");
+                    currentUserListItem = new UserListItem(currentName, bitPicture);
+                    userListItems.add(currentUserListItem);
+                }
+
+                UserListItemAdapter userListItemAdapter = new UserListItemAdapter(getApplicationContext(), userListItems);
+
+                usersListView.setAdapter(userListItemAdapter);
+
+                usersListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        openConversation(userListItems, position);
+                    }
+                });
             }
         } catch (Exception e){
             Toast.makeText(getApplicationContext(),
-                    "Error loading user list",
+                    e.toString(),
                     Toast.LENGTH_LONG).show();
         }
     }
