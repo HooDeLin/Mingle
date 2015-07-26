@@ -20,8 +20,14 @@
     <string name="nearby_button_text_view">Nearby</string>
     <string name="chat_button_text_view">Chat</string>
     <string name="settings_button_text_view">Settings</string>
+
+    <!--Nearby activity string values -->
+    <string name="no_nearby_text_view">Aww... There\'s no people near you</string>
+    <!-- End of nearby activity string values -->
+
     <!--Main activity string values -->
     <string name="title_activity_messaging">MessagingActivity</string>
+    <string name="no_previous_chat_text_view">You don\'t have any chat history</string>
     <!-- End of main activity string values -->
 
     <!-- Messaging activity string values -->

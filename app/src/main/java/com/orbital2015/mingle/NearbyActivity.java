@@ -15,6 +15,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -33,6 +34,8 @@ import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+
+import org.w3c.dom.Text;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
@@ -54,6 +57,7 @@ public class NearbyActivity extends ActionBarActivity implements ConnectionCallb
     private int currentRadius;
     private int currentLimit;
     private Bitmap bitPicture;
+    private TextView noNearbyTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +66,7 @@ public class NearbyActivity extends ActionBarActivity implements ConnectionCallb
         yourSettings = getApplicationContext().getSharedPreferences("MyPref", MODE_PRIVATE);
         currentRadius = yourSettings.getInt("radius", 0);
         currentLimit = yourSettings.getInt("limit", 0);
+        noNearbyTextView = (TextView) findViewById(R.id.noNearbyTextView);
         chatButton = (Button) findViewById(R.id.chatButton);
 
         chatButton.setOnClickListener(new View.OnClickListener() {
@@ -172,6 +177,10 @@ public class NearbyActivity extends ActionBarActivity implements ConnectionCallb
                 }
             });
 
+            if(nearbyList.size() == 0){
+                usersListView.setVisibility(View.GONE);
+                noNearbyTextView.setVisibility(View.VISIBLE);
+            }
         } catch(Exception e){
             Toast.makeText(getApplicationContext(),
                     "Some error just occur",

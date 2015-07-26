@@ -13,6 +13,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.parse.FindCallback;
@@ -34,12 +35,14 @@ public class MainActivity extends ActionBarActivity {
     private ListView usersListView;
     private ArrayAdapter<String> namesArrayAdapter;
     private Bitmap bitPicture;
+    private TextView noPreviousChatTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        noPreviousChatTextView = (TextView) findViewById(R.id.noPreviousChatTextView);
         nearByButton = (Button) findViewById(R.id.nearbyButton);
 
         nearByButton.setOnClickListener(new View.OnClickListener() {
@@ -102,6 +105,11 @@ public class MainActivity extends ActionBarActivity {
                     openConversation(userListItems, position);
                 }
             });
+
+            if(userList.size() == 0){
+                usersListView.setVisibility(View.GONE);
+                noPreviousChatTextView.setVisibility(View.VISIBLE);
+            }
         } catch (Exception e){
             Toast.makeText(getApplicationContext(),
                     "Error loading user list",
