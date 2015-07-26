@@ -37,6 +37,7 @@ import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -112,6 +113,47 @@ public class MessagingActivity extends ActionBarActivity {
 
         messageService.sendMessage(recipientId, messageBody);
         messageBodyField.setText("");
+
+        ParseQuery<ParseObject> userQuery = ParseQuery.getQuery("ProfileCredentials");
+        userQuery.whereEqualTo("userId", ParseUser.getCurrentUser().getObjectId().toString());
+
+        ParseQuery<ParseObject> recipientQuery = ParseQuery.getQuery("ProfileCredentials");
+        recipientQuery.whereEqualTo("userId", recipientId);
+
+        try {
+            ParseObject userParseObject = userQuery.getFirst();
+            ParseObject recipientParseObject = recipientQuery.getFirst();
+
+            List<String> userChatHistory = userParseObject.getList("ChatHistory");
+            List<String> recipientChatHistory = recipientParseObject.getList("ChatHistory");
+
+            if(userChatHistory.size() == 0){
+                userChatHistory.add(recipientId);
+                userParseObject.put("ChatHistory", userChatHistory);
+                userParseObject.save();
+            } else {
+                userChatHistory.remove(recipientId);
+                userChatHistory.add(0, recipientId);
+                userParseObject.put("ChatHistory", userChatHistory);
+                userParseObject.save();
+            }
+
+            if(recipientChatHistory.size() == 0){
+                recipientChatHistory.add(currentUserId);
+                recipientParseObject.put("ChatHistory", recipientChatHistory);
+                recipientParseObject.save();
+            } else {
+                recipientChatHistory.remove(currentUserId);
+                recipientChatHistory.add(0, currentUserId);
+                recipientParseObject.put("ChatHistory", recipientChatHistory);
+                recipientParseObject.save();
+            }
+        } catch(Exception e) {
+
+        }
+
+
+
     }
 
     @Override

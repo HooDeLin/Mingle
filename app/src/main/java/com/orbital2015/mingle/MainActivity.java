@@ -77,9 +77,6 @@ public class MainActivity extends ActionBarActivity {
             chatHistory = parseObject.getList("ChatHistory");
 
             if(chatHistory.size() == 0){
-                Toast.makeText(getApplicationContext(),
-                        "Over here",
-                        Toast.LENGTH_LONG).show();
                 usersListView.setVisibility(View.GONE);
                 noPreviousChatTextView.setVisibility(View.VISIBLE);
             } else {

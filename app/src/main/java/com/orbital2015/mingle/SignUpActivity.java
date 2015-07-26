@@ -17,6 +17,9 @@ import com.parse.ParseObject;
 import com.parse.ParseUser;
 import com.parse.SignUpCallback;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class SignUpActivity extends ActionBarActivity {
 
@@ -71,6 +74,8 @@ public class SignUpActivity extends ActionBarActivity {
                                 ParseObject userProfileCredentials = new ParseObject("ProfileCredentials");
                                 userProfileCredentials.put("userName", username);
                                 userProfileCredentials.put("userId", currentUserId);
+                                List<String> emptyList = new ArrayList<String>();
+                                userProfileCredentials.put("ChatHistory", emptyList);
                                 userProfileCredentials.saveInBackground();
 
                                 Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
