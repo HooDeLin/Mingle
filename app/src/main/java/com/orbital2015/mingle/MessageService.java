@@ -25,10 +25,12 @@ public class MessageService extends Service implements SinchClientListener{
     private SinchClient sinchClient = null;
     private MessageClient messageClient = null;
     private String currentUserId;
+    private String regId;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         currentUserId = ParseUser.getCurrentUser().getObjectId();
+        regId = intent.getStringExtra("regId");
 
         if(currentUserId != null && !isSinchClientStarted()){
             startSinchClient(currentUserId);
@@ -44,9 +46,11 @@ public class MessageService extends Service implements SinchClientListener{
 
         sinchClient.setSupportMessaging(true);
         sinchClient.setSupportActiveConnectionInBackground(true);
+        sinchClient.setSupportPushNotifications(true);
 
         sinchClient.checkManifest();
         sinchClient.start();
+        sinchClient.registerPushNotificationData(regId.getBytes());
     }
 
     private boolean isSinchClientStarted(){

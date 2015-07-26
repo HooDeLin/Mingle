@@ -3,9 +3,11 @@ package com.orbital2015.mingle;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.os.AsyncTask;
 import android.os.IBinder;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,6 +28,15 @@ import com.sinch.android.rtc.messaging.MessageDeliveryInfo;
 import com.sinch.android.rtc.messaging.MessageFailureInfo;
 import com.sinch.android.rtc.messaging.WritableMessage;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.BasicResponseHandler;
+import org.apache.http.impl.client.DefaultHttpClient;
+
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -169,6 +180,32 @@ public class MessagingActivity extends ActionBarActivity {
         public void onMessageDelivered(MessageClient client, MessageDeliveryInfo deliveryInfo) {}
 
         @Override
-        public void onShouldSendPushData(MessageClient client, Message message, List<PushPair> pushPairs) {}
+        public void onShouldSendPushData(MessageClient client, Message message, List<PushPair> pushPairs) {
+            final String regId = new String(pushPairs.get(0).getPushData());
+
+            class SendPushTask extends AsyncTask<Void, Void, Void> {
+
+                @Override
+                protected Void doInBackground(Void... voids) {
+                    HttpClient httpclient = new DefaultHttpClient();
+                    HttpPost httppost = new HttpPost("http://mingleorbital.herokuapp.com?reg_id=" + regId);
+
+                    try {
+                        HttpResponse response = httpclient.execute(httppost);
+                        ResponseHandler<String> handler = new BasicResponseHandler();
+                        Log.d("HttpResponse", handler.handleResponse(response));
+                    } catch (ClientProtocolException e) {
+                        Log.d("ClientProtocolException", e.toString());
+                    } catch (IOException e) {
+                        Log.d("IOException", e.toString());
+                    }
+
+                    return null;
+                }
+
+            }
+
+            (new SendPushTask()).execute();
+        }
     }
 }

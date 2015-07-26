@@ -131,7 +131,7 @@ public class NearbyActivity extends ActionBarActivity implements ConnectionCallb
         });
 
         userListItems = new ArrayList<UserListItem>();
-
+        /*
         ParseQuery<ParseObject> nearbyQuery = ParseQuery.getQuery("UserLocation");
         nearbyQuery.whereNotEqualTo("userId", currentUserId);
         ParseGeoPoint currentGeoPoint = new ParseGeoPoint(currentLocation.getLatitude(), currentLocation.getLongitude());
@@ -194,7 +194,7 @@ public class NearbyActivity extends ActionBarActivity implements ConnectionCallb
                             Toast.LENGTH_LONG).show();
                 }
             }
-        });
+        });*/
     }
 
     private void openProfile(ArrayList<UserListItem> userListItems, int position){

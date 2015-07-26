@@ -2,6 +2,7 @@ package com.orbital2015.mingle;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -12,10 +13,13 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
 import com.parse.SignUpCallback;
+
+import java.io.IOException;
 
 
 public class LoginActivity extends ActionBarActivity {
@@ -28,9 +32,38 @@ public class LoginActivity extends ActionBarActivity {
     private Intent intent;
     private Intent serviceIntent;
     private TextView signUpLink;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        final GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(getApplicationContext());
+
+        class RegisterGcmTask extends AsyncTask<Void, Void, String> {
+            String msg = "";
+
+            @Override
+            protected String doInBackground(Void... voids){
+                try {
+                    msg = gcm.register("your-profile-id");
+                } catch (IOException ex) {
+                    msg = "Error: " + ex.getMessage();
+                }
+
+                return msg;
+            }
+
+            @Override
+            protected void onPostExecute(String msg) {
+                intent = new Intent(getApplicationContext(), NearbyActivity.class);
+                serviceIntent = new Intent(getApplicationContext(), MessageService.class);
+
+                serviceIntent.putExtra("regId", msg);
+
+                startActivity(intent);
+                startService(serviceIntent);
+            }
+        }
+
         setContentView(R.layout.activity_login);
 
         loginUsernameEditText = (EditText) findViewById(R.id.loginUsernameEditText);
@@ -43,8 +76,7 @@ public class LoginActivity extends ActionBarActivity {
         ParseUser currentUser = ParseUser.getCurrentUser();
 
         if(currentUser != null){
-            startService(serviceIntent);
-            startActivity(intent);
+            (new RegisterGcmTask()).execute();
         }
 
         loginButton.setOnClickListener(new View.OnClickListener() {
@@ -61,8 +93,7 @@ public class LoginActivity extends ActionBarActivity {
                             editor.putInt("radius", 1);
                             editor.putInt("limit", 20);
                             editor.commit();
-                            startService(serviceIntent);
-                            startActivity(intent);
+                            (new RegisterGcmTask()).execute();
                             Toast.makeText(getApplicationContext(),
                                     "Logging in success!",
                                     Toast.LENGTH_LONG).show();

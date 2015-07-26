@@ -70,7 +70,7 @@ public class MainActivity extends ActionBarActivity {
                     }
 
                     usersListView = (ListView) findViewById(R.id.usersListView);
-                    namesArrayAdapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.user_list_item, nameList);
+                    namesArrayAdapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.user_list_item2, nameList);
                     usersListView.setAdapter(namesArrayAdapter);
                     usersListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                         @Override
