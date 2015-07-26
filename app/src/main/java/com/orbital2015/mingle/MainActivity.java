@@ -2,6 +2,8 @@ package com.orbital2015.mingle;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -15,6 +17,8 @@ import android.widget.Toast;
 
 import com.parse.FindCallback;
 import com.parse.ParseException;
+import com.parse.ParseFile;
+import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
@@ -26,9 +30,10 @@ public class MainActivity extends ActionBarActivity {
     private Button nearByButton;
     private Button settingsButton;
     private String currentUserID;
-    private ArrayList<String> nameList;
+    private ArrayList<UserListItem> userListItems;
     private ListView usersListView;
     private ArrayAdapter<String> namesArrayAdapter;
+    private Bitmap bitPicture;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,40 +61,57 @@ public class MainActivity extends ActionBarActivity {
         });
 
         currentUserID = ParseUser.getCurrentUser().getObjectId().toString();
-        nameList = new ArrayList<String>();
+        userListItems = new ArrayList<UserListItem>();
 
         ParseQuery<ParseUser> query = ParseUser.getQuery();
 
         query.whereNotEqualTo("objectId", currentUserID);
-        query.findInBackground(new FindCallback<ParseUser>() {
-            @Override
-            public void done(List<ParseUser> list, ParseException e) {
-                if(e == null){
-                    for(int i = 0; i < list.size(); i ++){
-                        nameList.add(list.get(i).getUsername().toString());
-                    }
+        try{
+            List<ParseUser> userList = query.find();
 
-                    usersListView = (ListView) findViewById(R.id.usersListView);
-                    namesArrayAdapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.user_list_item2, nameList);
-                    usersListView.setAdapter(namesArrayAdapter);
-                    usersListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                        @Override
-                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                            openConversation(nameList, position);
-                        }
-                    });
+            for(int i = 0; i < userList.size(); i ++) {
+                UserListItem currentUserListItem;
+                ParseUser currentParseUser = userList.get(i);
+                String currentParseObjectUserId = currentParseUser.getObjectId().toString();
+
+                ParseQuery<ParseObject> profilePicQuery = ParseQuery.getQuery("ProfileCredentials");
+                profilePicQuery.whereEqualTo("userId", currentParseObjectUserId);
+
+                ParseObject profilePicObject = profilePicQuery.getFirst();
+                ParseFile profilePicture = profilePicObject.getParseFile("profilePicture");
+                if (profilePicture == null) {
+                    bitPicture = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
                 } else {
-                    Toast.makeText(getApplicationContext(),
-                            "Error loading user list",
-                            Toast.LENGTH_LONG).show();
+                    byte[] bytes = profilePicture.getData();
+                    bitPicture = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
                 }
+
+                currentUserListItem = new UserListItem(currentParseUser.getUsername(), bitPicture);
+                userListItems.add(currentUserListItem);
             }
-        });
+
+
+            UserListItemAdapter userListItemAdapter = new UserListItemAdapter(getApplicationContext(), userListItems);
+
+            usersListView = (ListView) findViewById(R.id.usersListView);
+            usersListView.setAdapter(userListItemAdapter);
+
+            usersListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    openConversation(userListItems, position);
+                }
+            });
+        } catch (Exception e){
+            Toast.makeText(getApplicationContext(),
+                    "Error loading user list",
+                    Toast.LENGTH_LONG).show();
+        }
     }
 
-    public void openConversation(ArrayList<String> names, int pos) {
+    public void openConversation(ArrayList<UserListItem> userListItems, int pos) {
         ParseQuery<ParseUser> query = ParseUser.getQuery();
-        query.whereEqualTo("username", names.get(pos));
+        query.whereEqualTo("username", userListItems.get(pos).getMemberName());
         query.findInBackground(new FindCallback<ParseUser>() {
             public void done(List<ParseUser> user, ParseException e) {
                 if (e == null) {

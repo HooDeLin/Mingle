@@ -131,70 +131,52 @@ public class NearbyActivity extends ActionBarActivity implements ConnectionCallb
         });
 
         userListItems = new ArrayList<UserListItem>();
-        /*
+
         ParseQuery<ParseObject> nearbyQuery = ParseQuery.getQuery("UserLocation");
         nearbyQuery.whereNotEqualTo("userId", currentUserId);
         ParseGeoPoint currentGeoPoint = new ParseGeoPoint(currentLocation.getLatitude(), currentLocation.getLongitude());
         nearbyQuery.whereWithinKilometers("userLocation", currentGeoPoint, currentRadius);
         nearbyQuery.setLimit(currentLimit);
-        nearbyQuery.findInBackground(new FindCallback<ParseObject>() {
-            @Override
-            public void done(List<ParseObject> list, ParseException e) {
-                if (e == null) {
-                    for (int i = 0; i < list.size(); i++) {
-                        UserListItem currentUserListItem;
-                        ParseObject currentParseObject = list.get(i);
-                        String currentParseObjectUserId = currentParseObject.getString("userId");
+        try{
+            List<ParseObject> nearbyList = nearbyQuery.find();
+            for(int i = 0; i < nearbyList.size(); i ++){
+                UserListItem currentUserListItem;
+                ParseObject currentParseObject = nearbyList.get(i);
+                String currentParseObjectUserId = currentParseObject.getString("userId");
 
-                        ParseQuery<ParseObject> profilePicQuery = ParseQuery.getQuery("ProfileCredentials");
-                        profilePicQuery.whereEqualTo("userId", currentParseObjectUserId);
-                        profilePicQuery.getFirstInBackground(new GetCallback<ParseObject>() {
-                            @Override
-                            public void done(ParseObject parseObject, ParseException e) {
-                                if (e == null) {
-                                    ParseFile profilePicture = parseObject.getParseFile("profilePicture");
-                                    if (profilePicture == null) {
-                                        bitPicture = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
-                                    } else {
-                                        profilePicture.getDataInBackground(new GetDataCallback() {
-                                            @Override
-                                            public void done(byte[] bytes, ParseException e) {
-                                                bitPicture = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                                                Toast.makeText(getApplicationContext(),
-                                                        "Found picture",
-                                                        Toast.LENGTH_LONG).show();
-                                            }
-                                        });
-                                    }
-                                } else {
-                                    Toast.makeText(getApplicationContext(),
-                                            "Some error just occur",
-                                            Toast.LENGTH_LONG).show();
-                                }
-                            }
-                        });
-                        currentUserListItem = new UserListItem(currentParseObject.getString("userName"), bitPicture);
-                        userListItems.add(currentUserListItem);
-                    }
+                ParseQuery<ParseObject> profilePicQuery = ParseQuery.getQuery("ProfileCredentials");
+                profilePicQuery.whereEqualTo("userId", currentParseObjectUserId);
 
-                    UserListItemAdapter userListItemAdapter = new UserListItemAdapter(getApplicationContext(), userListItems);
-
-                    usersListView = (ListView) findViewById(R.id.usersListView);
-                    usersListView.setAdapter(userListItemAdapter);
-
-                    usersListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                        @Override
-                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                            openProfile(userListItems, position);
-                        }
-                    });
+                ParseObject profilePicObject = profilePicQuery.getFirst();
+                ParseFile profilePicture = profilePicObject.getParseFile("profilePicture");
+                if(profilePicture == null){
+                    bitPicture = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
                 } else {
-                    Toast.makeText(getApplicationContext(),
-                            "Error loading user list",
-                            Toast.LENGTH_LONG).show();
+                    byte[] bytes = profilePicture.getData();
+                    bitPicture = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
                 }
+
+                currentUserListItem = new UserListItem(currentParseObject.getString("userName"), bitPicture);
+                userListItems.add(currentUserListItem);
             }
-        });*/
+
+            UserListItemAdapter userListItemAdapter = new UserListItemAdapter(getApplicationContext(), userListItems);
+
+            usersListView = (ListView) findViewById(R.id.usersListView);
+            usersListView.setAdapter(userListItemAdapter);
+
+            usersListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    openProfile(userListItems, position);
+                }
+            });
+
+        } catch(Exception e){
+            Toast.makeText(getApplicationContext(),
+                    "Some error just occur",
+                    Toast.LENGTH_LONG).show();
+        }
     }
 
     private void openProfile(ArrayList<UserListItem> userListItems, int position){
