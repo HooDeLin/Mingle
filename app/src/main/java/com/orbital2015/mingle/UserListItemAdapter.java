@@ -40,6 +40,7 @@ public class UserListItemAdapter extends BaseAdapter {
     private class ViewHolder{
         ImageView profilePic;
         TextView memberName;
+        TextView status;
     }
 
     @Override
@@ -54,11 +55,13 @@ public class UserListItemAdapter extends BaseAdapter {
 
             holder.memberName = (TextView) convertView.findViewById(R.id.userListItemName);
             holder.profilePic = (ImageView) convertView.findViewById(R.id.userListItemProfilePic);
+            holder.status = (TextView) convertView.findViewById(R.id.userListItemStatus);
 
             UserListItem rowPosition = userListItems.get(position);
 
             holder.profilePic.setImageBitmap(rowPosition.getProfilePic());
             holder.memberName.setText(rowPosition.getMemberName());
+            holder.status.setText(rowPosition.getStatus());
 
             convertView.setTag(holder);
         } else {

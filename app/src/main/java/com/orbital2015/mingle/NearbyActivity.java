@@ -161,7 +161,7 @@ public class NearbyActivity extends ActionBarActivity implements ConnectionCallb
                     bitPicture = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
                 }
 
-                currentUserListItem = new UserListItem(currentParseObject.getString("userName"), bitPicture);
+                currentUserListItem = new UserListItem(currentParseObject.getString("userName"), bitPicture, "");
                 userListItems.add(currentUserListItem);
             }
 

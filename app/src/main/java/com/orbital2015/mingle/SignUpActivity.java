@@ -76,6 +76,8 @@ public class SignUpActivity extends ActionBarActivity {
                                 userProfileCredentials.put("userId", currentUserId);
                                 List<String> emptyList = new ArrayList<String>();
                                 userProfileCredentials.put("ChatHistory", emptyList);
+                                List<Integer> emptyNewMessageList = new ArrayList<Integer>();
+                                userProfileCredentials.put("NewMessage", emptyNewMessageList);
                                 userProfileCredentials.saveInBackground();
 
                                 Intent intent = new Intent(getApplicationContext(), LoginActivity.class);

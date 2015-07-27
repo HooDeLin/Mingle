@@ -37,6 +37,7 @@ public class MainActivity extends ActionBarActivity {
     private ArrayAdapter<String> namesArrayAdapter;
     private Bitmap bitPicture;
     private TextView noPreviousChatTextView;
+    ParseObject parseObject;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,9 +73,11 @@ public class MainActivity extends ActionBarActivity {
         query.whereEqualTo("userId", currentUserID);
 
         try {
-            ParseObject parseObject = query.getFirst();
+            parseObject = query.getFirst();
             List<String> chatHistory = new ArrayList<String>();
             chatHistory = parseObject.getList("ChatHistory");
+            List<Integer> newMessageList = new ArrayList<Integer>();
+            newMessageList = parseObject.getList("newMessage");
 
             if(chatHistory.size() == 0){
                 usersListView.setVisibility(View.GONE);
@@ -98,7 +101,11 @@ public class MainActivity extends ActionBarActivity {
                     ParseQuery<ParseObject> userNameQuery = ParseQuery.getQuery("ProfileCredentials");
                     userNameQuery.whereEqualTo("userId", currentParseObjectUserId);
                     String currentName = userNameQuery.getFirst().getString("userName");
-                    currentUserListItem = new UserListItem(currentName, bitPicture);
+                    if(newMessageList.get(i) == 1){
+                        currentUserListItem = new UserListItem(currentName, bitPicture, "New Message!");
+                    } else {
+                        currentUserListItem = new UserListItem(currentName, bitPicture, "");
+                    }
                     userListItems.add(currentUserListItem);
                 }
 
@@ -121,6 +128,11 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void openConversation(ArrayList<UserListItem> userListItems, int pos) {
+        List<Integer> newMessageList = parseObject.getList("newMessage");
+        newMessageList.remove(pos);
+        newMessageList.add(pos, 0);
+        parseObject.put("newMessage", newMessageList);
+        parseObject.saveInBackground();
         ParseQuery<ParseUser> query = ParseUser.getQuery();
         query.whereEqualTo("username", userListItems.get(pos).getMemberName());
         query.findInBackground(new FindCallback<ParseUser>() {

@@ -22,4 +22,13 @@
         android:text="txt"
         android:textSize="20sp" />
 
+    <TextView
+        android:id="@+id/userListItemStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/userListItemName"
+        android:layout_below="@+id/userListItemName"
+        android:text="txt"
+        android:textSize="16sp" />
+
 </RelativeLayout>
