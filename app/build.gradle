@@ -19,10 +19,17 @@ android {
     }
 }
 
+repositories {
+    mavenCentral()
+}
+
 dependencies {
     compile 'com.parse.bolts:bolts-android:1.+'
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.android.support:appcompat-v7:22.1.1'
     compile 'com.google.android.gms:play-services:7.5.0'
     compile files('libs/sinch-android-rtc-3.6.0.jar')
+    compile 'com.facebook.android:facebook-android-sdk:4.1.0'
+    compile files('libs/ParseFacebookUtilsV4-1.9.4.jar')
+    compile files('libs/Parse-1.9.4.jar')
 }

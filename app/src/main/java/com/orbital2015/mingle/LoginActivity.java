@@ -1,10 +1,13 @@
 package com.orbital2015.mingle;
 
+import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,10 +19,13 @@ import android.widget.Toast;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
+import com.parse.ParseFacebookUtils;
 import com.parse.ParseUser;
 import com.parse.SignUpCallback;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 
 public class LoginActivity extends ActionBarActivity {
@@ -32,6 +38,7 @@ public class LoginActivity extends ActionBarActivity {
     private Intent intent;
     private Intent serviceIntent;
     private TextView signUpLink;
+    private Dialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -161,6 +168,49 @@ public class LoginActivity extends ActionBarActivity {
                 }
             });
         }
+    }
+
+    public void onFacebookLoginClick(View v) {
+            progressDialog = ProgressDialog.show(LoginActivity.this, "", "Logging in...", true);
+
+            List<String> permissions = Arrays.asList("public_profile", "email");
+            // NOTE: for extended permissions, like "user_about_me", your app must be reviewed by the Facebook team
+            // (https://developers.facebook.com/docs/facebook-login/permissions/)
+        try {
+            ParseFacebookUtils.logInWithReadPermissionsInBackground(this, permissions, new LogInCallback() {
+                @Override
+                public void done(ParseUser user, ParseException err) {
+                    progressDialog.dismiss();
+                    if (user == null) {
+                        Toast.makeText(getApplicationContext(),
+                                "Uh oh. The user cancelled the Facebook login.",
+                                Toast.LENGTH_LONG).show();
+                    } else if (user.isNew()) {
+                        Toast.makeText(getApplicationContext(),
+                                "User signed up and logged in through Facebook!",
+                                Toast.LENGTH_LONG).show();
+                        Intent intent = new Intent(getApplicationContext(), NearbyActivity.class);
+                        startActivity(intent);
+                    } else {
+                        Toast.makeText(getApplicationContext(),
+                                "User logged in through Facebook!",
+                                Toast.LENGTH_LONG).show();
+                        Intent intent = new Intent(getApplicationContext(), NearbyActivity.class);
+                        startActivity(intent);
+                    }
+                }
+            });
+        } catch(Exception e){
+            Toast.makeText(getApplicationContext(),
+                   e.toString(),
+                    Toast.LENGTH_LONG).show();
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        ParseFacebookUtils.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
