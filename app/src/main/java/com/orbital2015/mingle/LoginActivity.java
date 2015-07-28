@@ -56,10 +56,14 @@ public class LoginActivity extends ActionBarActivity {
     private TextView loginUsernameTextView;
     private TextView loginPasswordTextView;
     private TextView loggedInAs;
+    private TextView backToMainPageTextView;
+    private TextView gpsInternetEnableTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        intent = new Intent(getApplicationContext(), NearbyActivity.class);
+        serviceIntent = new Intent(getApplicationContext(), MessageService.class);
         final GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(getApplicationContext());
 
         class RegisterGcmTask extends AsyncTask<Void, Void, String> {
@@ -135,40 +139,13 @@ public class LoginActivity extends ActionBarActivity {
     protected void onStart(){
         super.onStart();
         ParseUser currentUser = ParseUser.getCurrentUser();
-        final Context context = getApplicationContext();
-        LocationManager lm = (LocationManager)context.getSystemService(Context.LOCATION_SERVICE);
-        boolean gps_enabled = false;
-        boolean network_enabled = false;
 
-        try {
-            gps_enabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        } catch(Exception ex) {}
-
-        try {
-            network_enabled = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-        } catch(Exception ex) {}
-
-        initializeUIElement();
-        if(!gps_enabled && !network_enabled) {
-            loginUsernameTextView.setVisibility(View.GONE);
-            loginPasswordTextView.setVisibility(View.GONE);
-            loginPasswordEditText.setVisibility(View.GONE);
-            loginUsernameEditText.setVisibility(View.GONE);
-            signUpLink.setVisibility(View.GONE);
-            loginButton.setVisibility(View.GONE);
-            facebookLoginButton.setVisibility(View.GONE);
-            loggedInAs.setText("Please enable location service and internet connection before proceed");
+        if(isLocationServiceEnabled()) {
+            setGPSEnableLayout();
         } else if (currentUser != null) {
-            loginUsernameTextView.setVisibility(View.GONE);
-            loginPasswordTextView.setVisibility(View.GONE);
-            loginPasswordEditText.setVisibility(View.GONE);
-            loginUsernameEditText.setVisibility(View.GONE);
-            signUpLink.setVisibility(View.GONE);
-            loginButton.setVisibility(View.GONE);
-
+            setCurrentUserLayout();
             String loggedInAsString = "Logged in as " + currentUser.getUsername() + ". Sign out? ";
             loggedInAs.setText(loggedInAsString);
-            loggedInAs.setVisibility(View.VISIBLE);
             loggedInAs.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -178,9 +155,7 @@ public class LoginActivity extends ActionBarActivity {
                 }
             });
 
-            TextView backToMain = (TextView) findViewById(R.id.backToMainPage);
-            backToMain.setVisibility(View.VISIBLE);
-            backToMain.setOnClickListener(new View.OnClickListener() {
+            backToMainPageTextView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(getApplicationContext(), NearbyActivity.class);
@@ -188,14 +163,7 @@ public class LoginActivity extends ActionBarActivity {
                 }
             });
         } else {
-            loginUsernameTextView.setVisibility(View.VISIBLE);
-            loginPasswordTextView.setVisibility(View.VISIBLE);
-            loginPasswordEditText.setVisibility(View.VISIBLE);
-            loginUsernameEditText.setVisibility(View.VISIBLE);
-            signUpLink.setVisibility(View.VISIBLE);
-            loginButton.setVisibility(View.VISIBLE);
-            facebookLoginButton.setVisibility(View.VISIBLE);
-            loggedInAs.setVisibility(View.GONE);
+            setNormalLayout();
         }
     }
 
@@ -242,13 +210,65 @@ public class LoginActivity extends ActionBarActivity {
         loginUsernameEditText = (EditText) findViewById(R.id.loginUsernameEditText);
         loginPasswordEditText = (EditText) findViewById(R.id.loginPasswordEditText);
         loginButton = (Button) findViewById(R.id.loginButton);
-        intent = new Intent(getApplicationContext(), NearbyActivity.class);
-        serviceIntent = new Intent(getApplicationContext(), MessageService.class);
         signUpLink = (TextView) findViewById(R.id.signUpLink);
         facebookLoginButton = (Button) findViewById(R.id.facebookLoginButton);
         loginUsernameTextView = (TextView) findViewById(R.id.loginUsernameText);
         loginPasswordTextView = (TextView) findViewById(R.id.loginPasswordText);
         loggedInAs = (TextView) findViewById(R.id.loggedInTextView);
+        backToMainPageTextView = (TextView) findViewById(R.id.backToMainPageTextView);
+        gpsInternetEnableTextView = (TextView) findViewById(R.id.gpsInternetEnableTextView);
+    }
+
+    private void setGPSEnableLayout(){
+        loginUsernameTextView.setVisibility(View.GONE);
+        loginPasswordTextView.setVisibility(View.GONE);
+        loginPasswordEditText.setVisibility(View.GONE);
+        loginUsernameEditText.setVisibility(View.GONE);
+        signUpLink.setVisibility(View.GONE);
+        loginButton.setVisibility(View.GONE);
+        facebookLoginButton.setVisibility(View.GONE);
+        loggedInAs.setVisibility(View.GONE);
+        backToMainPageTextView.setVisibility(View.GONE);
+        gpsInternetEnableTextView.setVisibility(View.VISIBLE);
+    }
+
+    private void setCurrentUserLayout(){
+        loginUsernameTextView.setVisibility(View.GONE);
+        loginPasswordTextView.setVisibility(View.GONE);
+        loginPasswordEditText.setVisibility(View.GONE);
+        loginUsernameEditText.setVisibility(View.GONE);
+        signUpLink.setVisibility(View.GONE);
+        loginButton.setVisibility(View.GONE);
+        facebookLoginButton.setVisibility(View.GONE);
+        gpsInternetEnableTextView.setVisibility(View.GONE);
+        backToMainPageTextView.setVisibility(View.VISIBLE);
+        loggedInAs.setVisibility(View.VISIBLE);
+    }
+
+    private void setNormalLayout(){
+        loginUsernameTextView.setVisibility(View.VISIBLE);
+        loginPasswordTextView.setVisibility(View.VISIBLE);
+        loginPasswordEditText.setVisibility(View.VISIBLE);
+        loginUsernameEditText.setVisibility(View.VISIBLE);
+        signUpLink.setVisibility(View.VISIBLE);
+        loginButton.setVisibility(View.VISIBLE);
+        facebookLoginButton.setVisibility(View.VISIBLE);
+        loggedInAs.setVisibility(View.GONE);
+        backToMainPageTextView.setVisibility(View.GONE);
+        gpsInternetEnableTextView.setVisibility(View.GONE);
+    }
+
+    private boolean isLocationServiceEnabled(){
+        LocationManager locationManager = (LocationManager)getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
+        boolean gps_enabled = false;
+        boolean network_enabled = false;
+
+        try {
+            gps_enabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+            network_enabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+        } catch(Exception e) {}
+
+        return !gps_enabled && !network_enabled;
     }
 
     private void createPreferences(){
@@ -320,7 +340,6 @@ public class LoginActivity extends ActionBarActivity {
                             userProfileCredentials.save();
                             userLocation.save();
                             currentUser.save();
-                            Log.e("Update", "Update");
                         }
                     }
                 } catch(Exception e){

@@ -15,6 +15,7 @@
     <string name="logged_in_text_view">Logged in as ... . Sign out?</string>
     <string name="sign_up_link">Don\'t have an account yet? Click here to sign up!</string>
     <string name="back_main_page_text_view">Back to main page</string>
+    <string name="gps_internet_enable_text_view">Please ensure your internet connection exists and location service is enabled</string>
     <!--End of login activity string values -->
 
     <!--Top buttons string values -->
