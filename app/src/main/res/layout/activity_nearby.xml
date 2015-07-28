@@ -44,7 +44,10 @@
         android:padding="16dp"
         android:background="#fffafafa"
         android:id="@+id/usersListView"
-        android:layout_below="@+id/buttonContainer">
+        android:layout_alignRight="@+id/mingleButton"
+        android:layout_alignEnd="@+id/mingleButton"
+        android:layout_below="@+id/buttonContainer"
+        android:layout_above="@+id/mingleButton">
     </ListView>
 
     <TextView
@@ -61,5 +64,15 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:visibility="gone"/>
+
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Mingle"
+        android:id="@+id/mingleButton"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
 
 </RelativeLayout>

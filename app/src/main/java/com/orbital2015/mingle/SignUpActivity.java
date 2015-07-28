@@ -1,5 +1,6 @@
 package com.orbital2015.mingle;
 
+import android.app.IntentService;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
@@ -58,8 +59,10 @@ public class SignUpActivity extends ActionBarActivity {
                             if (e == null) {
                                 newSignUpSettings();
 
-                                Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                                Intent intent = new Intent(getApplicationContext(), NearbyActivity.class);
+                                Intent serviceIntent = new Intent(getApplicationContext(), MessageService.class);
                                 startActivity(intent);
+                                startService(serviceIntent);
                             } else {
                                 Toast.makeText(getApplicationContext(),
                                         "There was an error signing in.",

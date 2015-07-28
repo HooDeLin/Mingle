@@ -1,12 +1,18 @@
 package com.orbital2015.mingle;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.location.LocationManager;
 import android.os.AsyncTask;
+import android.provider.Settings;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -129,8 +135,30 @@ public class LoginActivity extends ActionBarActivity {
     protected void onStart(){
         super.onStart();
         ParseUser currentUser = ParseUser.getCurrentUser();
-        if(currentUser != null){
+        final Context context = getApplicationContext();
+        LocationManager lm = (LocationManager)context.getSystemService(Context.LOCATION_SERVICE);
+        boolean gps_enabled = false;
+        boolean network_enabled = false;
 
+        try {
+            gps_enabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        } catch(Exception ex) {}
+
+        try {
+            network_enabled = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+        } catch(Exception ex) {}
+
+        initializeUIElement();
+        if(!gps_enabled && !network_enabled) {
+            loginUsernameTextView.setVisibility(View.GONE);
+            loginPasswordTextView.setVisibility(View.GONE);
+            loginPasswordEditText.setVisibility(View.GONE);
+            loginUsernameEditText.setVisibility(View.GONE);
+            signUpLink.setVisibility(View.GONE);
+            loginButton.setVisibility(View.GONE);
+            facebookLoginButton.setVisibility(View.GONE);
+            loggedInAs.setText("Please enable location service and internet connection before proceed");
+        } else if (currentUser != null) {
             loginUsernameTextView.setVisibility(View.GONE);
             loginPasswordTextView.setVisibility(View.GONE);
             loginPasswordEditText.setVisibility(View.GONE);
@@ -159,6 +187,15 @@ public class LoginActivity extends ActionBarActivity {
                     startActivity(intent);
                 }
             });
+        } else {
+            loginUsernameTextView.setVisibility(View.VISIBLE);
+            loginPasswordTextView.setVisibility(View.VISIBLE);
+            loginPasswordEditText.setVisibility(View.VISIBLE);
+            loginUsernameEditText.setVisibility(View.VISIBLE);
+            signUpLink.setVisibility(View.VISIBLE);
+            loginButton.setVisibility(View.VISIBLE);
+            facebookLoginButton.setVisibility(View.VISIBLE);
+            loggedInAs.setVisibility(View.GONE);
         }
     }
 
@@ -168,7 +205,6 @@ public class LoginActivity extends ActionBarActivity {
         List<String> permissions = Arrays.asList("public_profile", "email");
 
         try {
-
             ParseFacebookUtils.logInWithReadPermissionsInBackground(this, permissions, new LogInCallback() {
                 @Override
                 public void done(ParseUser user, ParseException err) {
@@ -181,6 +217,7 @@ public class LoginActivity extends ActionBarActivity {
                         startService(serviceIntent);
                     } else {
                         updateDatabase();
+                        createPreferences();
                         Intent intent = new Intent(getApplicationContext(), NearbyActivity.class);
                         startActivity(intent);
                         startService(serviceIntent);
@@ -209,9 +246,9 @@ public class LoginActivity extends ActionBarActivity {
         serviceIntent = new Intent(getApplicationContext(), MessageService.class);
         signUpLink = (TextView) findViewById(R.id.signUpLink);
         facebookLoginButton = (Button) findViewById(R.id.facebookLoginButton);
-        TextView loginUsernameTextView = (TextView) findViewById(R.id.loginUsernameText);
-        TextView loginPasswordTextView = (TextView) findViewById(R.id.loginPasswordText);
-        TextView loggedInAs = (TextView) findViewById(R.id.loggedInTextView);
+        loginUsernameTextView = (TextView) findViewById(R.id.loginUsernameText);
+        loginPasswordTextView = (TextView) findViewById(R.id.loginPasswordText);
+        loggedInAs = (TextView) findViewById(R.id.loggedInTextView);
     }
 
     private void createPreferences(){
@@ -242,20 +279,13 @@ public class LoginActivity extends ActionBarActivity {
                         userLocation.put("userName", jsonObject.getString("name"));
                         userProfileCredentials.put("userName", jsonObject.getString("name"));
                         currentUser.setUsername(jsonObject.getString("name"));
-
-                        userProfileCredentials.saveInBackground();
-                        userLocation.saveInBackground();
-                        currentUser.saveInBackground();
+                        currentUser.save();
+                        userProfileCredentials.save();
+                        userLocation.save();
                     } catch (Exception e) {
-                        Toast.makeText(getApplicationContext(),
-                                e.toString(),
-                                Toast.LENGTH_LONG).show();
+                        Log.e("Saving info", "failed");
                     }
                 }
-
-                userProfileCredentials.saveInBackground();
-                userLocation.saveInBackground();
-                currentUser.saveInBackground();
             }
         });
         request.executeAsync();
@@ -282,16 +312,19 @@ public class LoginActivity extends ActionBarActivity {
                     ParseObject userLocation = userLocationQuery.getFirst();
 
                     if(jsonObject != null) {
-                        userLocation.put("userName", jsonObject.getString("name"));
-                        userProfileCredentials.put("userName", jsonObject.getString("name"));
-                        currentUser.setUsername(jsonObject.getString("name"));
+                        if(!ParseUser.getCurrentUser().getUsername().equals(jsonObject.getString("name"))){
+                            userLocation.put("userName", jsonObject.getString("name"));
+                            userProfileCredentials.put("userName", jsonObject.getString("name"));
+                            currentUser.setUsername(jsonObject.getString("name"));
 
-                        userProfileCredentials.saveInBackground();
-                        userLocation.saveInBackground();
-                        currentUser.saveInBackground();
+                            userProfileCredentials.save();
+                            userLocation.save();
+                            currentUser.save();
+                            Log.e("Update", "Update");
+                        }
                     }
                 } catch(Exception e){
-
+                    Log.e("Update info", "failed");
                 }
             }
         });

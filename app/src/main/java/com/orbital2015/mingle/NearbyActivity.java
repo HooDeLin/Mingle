@@ -8,6 +8,7 @@ import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -54,6 +55,7 @@ public class NearbyActivity extends ActionBarActivity implements ConnectionCallb
     private int currentLimit;
     private Bitmap bitPicture;
     private TextView noNearbyTextView;
+    private Button mingleButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,6 +89,81 @@ public class NearbyActivity extends ActionBarActivity implements ConnectionCallb
         }
 
         currentUserId = ParseUser.getCurrentUser().getObjectId();
+
+        mingleButton = (Button) findViewById(R.id.mingleButton);
+        mingleButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                currentLocation = getLocation();
+
+                ParseQuery<ParseObject> query = ParseQuery.getQuery("UserLocation");
+                if (ParseUser.getCurrentUser() == null) {
+                    Log.e("current user", "null");
+                } else {
+                    Log.e("current user", "not null");
+                }
+                query.whereEqualTo("userId", ParseUser.getCurrentUser().getObjectId());
+                try {
+                    ParseObject queryObject = query.getFirst();
+                    queryObject.put("userLocation", new ParseGeoPoint(currentLocation.getLatitude(), currentLocation.getLongitude()));
+                    queryObject.save();
+
+                } catch(Exception e){
+
+                }
+
+                userListItems = new ArrayList<UserListItem>();
+
+                ParseQuery<ParseObject> nearbyQuery = ParseQuery.getQuery("UserLocation");
+                nearbyQuery.whereNotEqualTo("userId", currentUserId);
+                ParseGeoPoint currentGeoPoint = new ParseGeoPoint(currentLocation.getLatitude(), currentLocation.getLongitude());
+                nearbyQuery.whereWithinKilometers("userLocation", currentGeoPoint, currentRadius);
+                nearbyQuery.setLimit(currentLimit);
+                try{
+                    List<ParseObject> nearbyList = nearbyQuery.find();
+                    for(int i = 0; i < nearbyList.size(); i ++){
+                        UserListItem currentUserListItem;
+                        ParseObject currentParseObject = nearbyList.get(i);
+                        String currentParseObjectUserId = currentParseObject.getString("userId");
+
+                        ParseQuery<ParseObject> profilePicQuery = ParseQuery.getQuery("ProfileCredentials");
+                        profilePicQuery.whereEqualTo("userId", currentParseObjectUserId);
+
+                        ParseObject profilePicObject = profilePicQuery.getFirst();
+                        ParseFile profilePicture = profilePicObject.getParseFile("profilePicture");
+                        if(profilePicture == null){
+                            bitPicture = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
+                        } else {
+                            byte[] bytes = profilePicture.getData();
+                            bitPicture = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                        }
+
+                        currentUserListItem = new UserListItem(currentParseObject.getString("userName"), bitPicture, "");
+                        userListItems.add(currentUserListItem);
+                    }
+
+                    UserListItemAdapter userListItemAdapter = new UserListItemAdapter(getApplicationContext(), userListItems);
+
+                    usersListView = (ListView) findViewById(R.id.usersListView);
+                    usersListView.setAdapter(userListItemAdapter);
+
+                    usersListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                            openProfile(userListItems, position);
+                        }
+                    });
+
+                    if(nearbyList.size() == 0){
+                        usersListView.setVisibility(View.GONE);
+                        noNearbyTextView.setVisibility(View.VISIBLE);
+                    }
+
+                } catch(Exception e){
+
+                }
+            }
+        });
     }
 
     @Override
@@ -113,24 +190,28 @@ public class NearbyActivity extends ActionBarActivity implements ConnectionCallb
 
     @Override
     public void onConnected(Bundle bundle) {
-
+        Toast.makeText(getApplicationContext(),
+                "Connected",
+                Toast.LENGTH_SHORT).show();
+/*
         currentLocation = getLocation();
 
         ParseQuery<ParseObject> query = ParseQuery.getQuery("UserLocation");
-        query.whereEqualTo("userId", currentUserId);
-        query.getFirstInBackground(new GetCallback<ParseObject>() {
-            @Override
-            public void done(ParseObject parseObject, ParseException e) {
-                if(e == null) {
-                    parseObject.put("userLocation", new ParseGeoPoint(currentLocation.getLatitude(), currentLocation.getLongitude()));
-                    parseObject.saveInBackground();
-                } else {
-                    Toast.makeText(getApplicationContext(),
-                            "first error",
-                            Toast.LENGTH_LONG).show();
-                }
-            }
-        });
+        if (ParseUser.getCurrentUser() == null) {
+            Log.e("current user", "null");
+        } else {
+            Log.e("current user", "not null");
+        }
+        query.whereEqualTo("userId", ParseUser.getCurrentUser().getObjectId());
+        try {
+            ParseObject queryObject = query.getFirst();
+            queryObject.put("userLocation", new ParseGeoPoint(currentLocation.getLatitude(), currentLocation.getLongitude()));
+            queryObject.save();
+
+        } catch(Exception e){
+
+        }
+
 
         userListItems = new ArrayList<UserListItem>();
 
@@ -178,11 +259,26 @@ public class NearbyActivity extends ActionBarActivity implements ConnectionCallb
                 usersListView.setVisibility(View.GONE);
                 noNearbyTextView.setVisibility(View.VISIBLE);
             }
+
         } catch(Exception e){
-            Toast.makeText(getApplicationContext(),
-                    "second error",
-                    Toast.LENGTH_LONG).show();
+
         }
+
+            ParseQuery<ParseObject> query = ParseQuery.getQuery("UserLocation");
+            if (ParseUser.getCurrentUser() == null) {
+                Log.e("current user", "null");
+            } else {
+                Log.e("current user", "not null");
+            }
+            query.whereEqualTo("userId", ParseUser.getCurrentUser().getObjectId());
+        try {
+            ParseObject queryObject = query.getFirst();
+            queryObject.put("userLocation", new ParseGeoPoint(currentLocation.getLatitude(), currentLocation.getLongitude()));
+            queryObject.save();
+
+        } catch(Exception e){
+
+        }*/
     }
 
     private void openProfile(ArrayList<UserListItem> userListItems, int position){
