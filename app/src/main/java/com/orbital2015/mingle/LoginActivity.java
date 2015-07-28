@@ -7,7 +7,6 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,10 +19,12 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseFacebookUtils;
+import com.parse.ParseObject;
 import com.parse.ParseUser;
 import com.parse.SignUpCallback;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -39,6 +40,10 @@ public class LoginActivity extends ActionBarActivity {
     private Intent serviceIntent;
     private TextView signUpLink;
     private Dialog progressDialog;
+    private Button facebookLoginButton;
+    private TextView loginUsernameTextView;
+    private TextView loginPasswordTextView;
+    private TextView loggedInAs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,12 +78,7 @@ public class LoginActivity extends ActionBarActivity {
 
         setContentView(R.layout.activity_login);
 
-        loginUsernameEditText = (EditText) findViewById(R.id.loginUsernameEditText);
-        loginPasswordEditText = (EditText) findViewById(R.id.loginPasswordEditText);
-        loginButton = (Button) findViewById(R.id.loginButton);
-        intent = new Intent(getApplicationContext(), NearbyActivity.class);
-        serviceIntent = new Intent(getApplicationContext(), MessageService.class);
-        signUpLink = (TextView) findViewById(R.id.signUpLink);
+        initializeUIElement();
 
         ParseUser currentUser = ParseUser.getCurrentUser();
 
@@ -95,11 +95,7 @@ public class LoginActivity extends ActionBarActivity {
                     @Override
                     public void done(ParseUser parseUser, ParseException e) {
                         if (parseUser != null) {
-                            SharedPreferences pref = getApplicationContext().getSharedPreferences("MyPref", MODE_PRIVATE);
-                            SharedPreferences.Editor editor = pref.edit();
-                            editor.putInt("radius", 1);
-                            editor.putInt("limit", 20);
-                            editor.commit();
+                            createPreferences();
                             (new RegisterGcmTask()).execute();
                             Toast.makeText(getApplicationContext(),
                                     "Logging in success!",
@@ -128,24 +124,14 @@ public class LoginActivity extends ActionBarActivity {
         super.onStart();
         ParseUser currentUser = ParseUser.getCurrentUser();
         if(currentUser != null){
-            TextView loginUsernameTextView = (TextView) findViewById(R.id.loginUsernameText);
-            TextView loginPasswordTextView = (TextView) findViewById(R.id.loginPasswordText);
 
             loginUsernameTextView.setVisibility(View.GONE);
             loginPasswordTextView.setVisibility(View.GONE);
-
-            loginUsernameEditText = (EditText) findViewById(R.id.loginUsernameEditText);
-            loginPasswordEditText = (EditText) findViewById(R.id.loginPasswordEditText);
-
             loginPasswordEditText.setVisibility(View.GONE);
             loginUsernameEditText.setVisibility(View.GONE);
             signUpLink.setVisibility(View.GONE);
-
-            loginButton = (Button) findViewById(R.id.loginButton);
-
             loginButton.setVisibility(View.GONE);
 
-            TextView loggedInAs = (TextView) findViewById(R.id.loggedInTextView);
             String loggedInAsString = "Logged in as " + currentUser.getUsername() + ". Sign out? ";
             loggedInAs.setText(loggedInAsString);
             loggedInAs.setVisibility(View.VISIBLE);
@@ -174,35 +160,55 @@ public class LoginActivity extends ActionBarActivity {
             progressDialog = ProgressDialog.show(LoginActivity.this, "", "Logging in...", true);
 
             List<String> permissions = Arrays.asList("public_profile", "email");
-            // NOTE: for extended permissions, like "user_about_me", your app must be reviewed by the Facebook team
-            // (https://developers.facebook.com/docs/facebook-login/permissions/)
+
         try {
+
             ParseFacebookUtils.logInWithReadPermissionsInBackground(this, permissions, new LogInCallback() {
                 @Override
                 public void done(ParseUser user, ParseException err) {
                     progressDialog.dismiss();
                     if (user == null) {
-                        Toast.makeText(getApplicationContext(),
-                                "Uh oh. The user cancelled the Facebook login.",
-                                Toast.LENGTH_LONG).show();
                     } else if (user.isNew()) {
+                        SharedPreferences pref = getApplicationContext().getSharedPreferences("MyPref", MODE_PRIVATE);
+                        SharedPreferences.Editor editor = pref.edit();
+                        editor.putInt("radius", 1);
+                        editor.putInt("limit", 20);
+                        editor.commit();
+                        Toast.makeText(getApplicationContext(),
+                                "Signing up success!",
+                                Toast.LENGTH_LONG).show();
+
+                        String currentUserId = ParseUser.getCurrentUser().getObjectId().toString();
+                        ParseObject userLocation = new ParseObject("UserLocation");
+                        userLocation.put("userId", currentUserId);
+                        userLocation.put("userName", ParseUser.getCurrentUser().getUsername());
+                        userLocation.saveInBackground();
+
+                        ParseObject userProfileCredentials = new ParseObject("ProfileCredentials");
+                        userProfileCredentials.put("userName", ParseUser.getCurrentUser().getUsername());
+                        userProfileCredentials.put("userId", currentUserId);
+                        List<String> emptyList = new ArrayList<String>();
+                        userProfileCredentials.put("ChatHistory", emptyList);
+                        List<Integer> emptyNewMessageList = new ArrayList<Integer>();
+                        userProfileCredentials.put("NewMessage", emptyNewMessageList);
+                        userProfileCredentials.saveInBackground();
                         Toast.makeText(getApplicationContext(),
                                 "User signed up and logged in through Facebook!",
                                 Toast.LENGTH_LONG).show();
                         Intent intent = new Intent(getApplicationContext(), NearbyActivity.class);
                         startActivity(intent);
+                        startService(serviceIntent);
                     } else {
-                        Toast.makeText(getApplicationContext(),
-                                "User logged in through Facebook!",
-                                Toast.LENGTH_LONG).show();
                         Intent intent = new Intent(getApplicationContext(), NearbyActivity.class);
                         startActivity(intent);
+                        startService(serviceIntent);
                     }
                 }
             });
         } catch(Exception e){
+            progressDialog.dismiss();
             Toast.makeText(getApplicationContext(),
-                   e.toString(),
+                   "Something went wrong, please try again later",
                     Toast.LENGTH_LONG).show();
         }
     }
@@ -211,6 +217,27 @@ public class LoginActivity extends ActionBarActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         ParseFacebookUtils.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private void initializeUIElement(){
+        loginUsernameEditText = (EditText) findViewById(R.id.loginUsernameEditText);
+        loginPasswordEditText = (EditText) findViewById(R.id.loginPasswordEditText);
+        loginButton = (Button) findViewById(R.id.loginButton);
+        intent = new Intent(getApplicationContext(), NearbyActivity.class);
+        serviceIntent = new Intent(getApplicationContext(), MessageService.class);
+        signUpLink = (TextView) findViewById(R.id.signUpLink);
+        facebookLoginButton = (Button) findViewById(R.id.facebookLoginButton);
+        TextView loginUsernameTextView = (TextView) findViewById(R.id.loginUsernameText);
+        TextView loginPasswordTextView = (TextView) findViewById(R.id.loginPasswordText);
+        TextView loggedInAs = (TextView) findViewById(R.id.loggedInTextView);
+    }
+
+    private void createPreferences(){
+        SharedPreferences pref = getApplicationContext().getSharedPreferences("MyPref", MODE_PRIVATE);
+        SharedPreferences.Editor editor = pref.edit();
+        editor.putInt("radius", 1);
+        editor.putInt("limit", 20);
+        editor.commit();
     }
 
     @Override

@@ -11,7 +11,7 @@ public class BaseApplication extends Application {
     public void onCreate(){
         super.onCreate();
         FacebookSdk.sdkInitialize(getApplicationContext());
-        Parse.initialize(this, "", "");
+        Parse.initialize(this, "0I7xvU5Sf08TcROv6nQRXwYpUVVxdUKjTy11nBHW", "DLFvACf2dn2Q3DpzVe7qlx2r2jR3QmTDd2cGd4Om");
         ParseFacebookUtils.initialize(this);
     }
 }

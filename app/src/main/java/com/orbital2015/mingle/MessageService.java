@@ -18,8 +18,8 @@ import com.sinch.android.rtc.messaging.WritableMessage;
 
 public class MessageService extends Service implements SinchClientListener{
 
-    private static final String APP_KEY = "key";
-    private static final String APP_SECRET = "secret";
+    private static final String APP_KEY = "81878954-e5e3-4b9b-a3c3-f616fc1d31ca";
+    private static final String APP_SECRET = "Etmv7quBYUmWC/CiNjnXSw==";
     private static final String ENVIRONMENT = "sandbox.sinch.com";
     private final MessageServiceInterface serviceInterface = new MessageServiceInterface();
     private SinchClient sinchClient = null;
@@ -46,11 +46,9 @@ public class MessageService extends Service implements SinchClientListener{
 
         sinchClient.setSupportMessaging(true);
         sinchClient.setSupportActiveConnectionInBackground(true);
-        sinchClient.setSupportPushNotifications(true);
 
         sinchClient.checkManifest();
         sinchClient.start();
-        sinchClient.registerPushNotificationData(regId.getBytes());
     }
 
     private boolean isSinchClientStarted(){
