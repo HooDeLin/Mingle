@@ -15,13 +15,19 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.AccessToken;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
-import com.parse.SignUpCallback;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -157,9 +163,9 @@ public class LoginActivity extends ActionBarActivity {
     }
 
     public void onFacebookLoginClick(View v) {
-            progressDialog = ProgressDialog.show(LoginActivity.this, "", "Logging in...", true);
+        progressDialog = ProgressDialog.show(LoginActivity.this, "", "Logging in...", true);
 
-            List<String> permissions = Arrays.asList("public_profile", "email");
+        List<String> permissions = Arrays.asList("public_profile", "email");
 
         try {
 
@@ -169,36 +175,12 @@ public class LoginActivity extends ActionBarActivity {
                     progressDialog.dismiss();
                     if (user == null) {
                     } else if (user.isNew()) {
-                        SharedPreferences pref = getApplicationContext().getSharedPreferences("MyPref", MODE_PRIVATE);
-                        SharedPreferences.Editor editor = pref.edit();
-                        editor.putInt("radius", 1);
-                        editor.putInt("limit", 20);
-                        editor.commit();
-                        Toast.makeText(getApplicationContext(),
-                                "Signing up success!",
-                                Toast.LENGTH_LONG).show();
-
-                        String currentUserId = ParseUser.getCurrentUser().getObjectId().toString();
-                        ParseObject userLocation = new ParseObject("UserLocation");
-                        userLocation.put("userId", currentUserId);
-                        userLocation.put("userName", ParseUser.getCurrentUser().getUsername());
-                        userLocation.saveInBackground();
-
-                        ParseObject userProfileCredentials = new ParseObject("ProfileCredentials");
-                        userProfileCredentials.put("userName", ParseUser.getCurrentUser().getUsername());
-                        userProfileCredentials.put("userId", currentUserId);
-                        List<String> emptyList = new ArrayList<String>();
-                        userProfileCredentials.put("ChatHistory", emptyList);
-                        List<Integer> emptyNewMessageList = new ArrayList<Integer>();
-                        userProfileCredentials.put("NewMessage", emptyNewMessageList);
-                        userProfileCredentials.saveInBackground();
-                        Toast.makeText(getApplicationContext(),
-                                "User signed up and logged in through Facebook!",
-                                Toast.LENGTH_LONG).show();
+                        newSignUpSettings();
                         Intent intent = new Intent(getApplicationContext(), NearbyActivity.class);
                         startActivity(intent);
                         startService(serviceIntent);
                     } else {
+                        updateDatabase();
                         Intent intent = new Intent(getApplicationContext(), NearbyActivity.class);
                         startActivity(intent);
                         startService(serviceIntent);
@@ -238,6 +220,82 @@ public class LoginActivity extends ActionBarActivity {
         editor.putInt("radius", 1);
         editor.putInt("limit", 20);
         editor.commit();
+    }
+
+    private void initializeDatabase(){
+        GraphRequest request = GraphRequest.newMeRequest(AccessToken.getCurrentAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
+            @Override
+            public void onCompleted(JSONObject jsonObject, GraphResponse graphResponse) {
+                String currentUserId = ParseUser.getCurrentUser().getObjectId().toString();
+                ParseUser currentUser = ParseUser.getCurrentUser();
+                ParseObject userLocation = new ParseObject("UserLocation");
+                ParseObject userProfileCredentials = new ParseObject("ProfileCredentials");
+                userLocation.put("userId", currentUserId);
+                userProfileCredentials.put("userId", currentUserId);
+                List<String> emptyList = new ArrayList<String>();
+                userProfileCredentials.put("ChatHistory", emptyList);
+                List<Integer> emptyNewMessageList = new ArrayList<Integer>();
+                userProfileCredentials.put("newMessage", emptyNewMessageList);
+
+                if(jsonObject != null){
+                    try {
+                        userLocation.put("userName", jsonObject.getString("name"));
+                        userProfileCredentials.put("userName", jsonObject.getString("name"));
+                        currentUser.setUsername(jsonObject.getString("name"));
+
+                        userProfileCredentials.saveInBackground();
+                        userLocation.saveInBackground();
+                        currentUser.saveInBackground();
+                    } catch (Exception e) {
+                        Toast.makeText(getApplicationContext(),
+                                e.toString(),
+                                Toast.LENGTH_LONG).show();
+                    }
+                }
+
+                userProfileCredentials.saveInBackground();
+                userLocation.saveInBackground();
+                currentUser.saveInBackground();
+            }
+        });
+        request.executeAsync();
+    }
+
+    private void newSignUpSettings(){
+        createPreferences();
+        initializeDatabase();
+    }
+
+    private void updateDatabase(){
+        GraphRequest request = GraphRequest.newMeRequest(AccessToken.getCurrentAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
+            @Override
+            public void onCompleted(JSONObject jsonObject, GraphResponse graphResponse) {
+                try {
+                    String currentUserId = ParseUser.getCurrentUser().getObjectId().toString();
+
+                    ParseUser currentUser = ParseUser.getCurrentUser();
+                    ParseQuery<ParseObject> profileCredentialsQuery = ParseQuery.getQuery("ProfileCredentials");
+                    ParseQuery<ParseObject> userLocationQuery = ParseQuery.getQuery("UserLocation");
+                    profileCredentialsQuery.whereEqualTo("userId", currentUserId);
+                    userLocationQuery.whereEqualTo("userId", currentUserId);
+                    ParseObject userProfileCredentials = profileCredentialsQuery.getFirst();
+                    ParseObject userLocation = userLocationQuery.getFirst();
+
+                    if(jsonObject != null) {
+                        userLocation.put("userName", jsonObject.getString("name"));
+                        userProfileCredentials.put("userName", jsonObject.getString("name"));
+                        currentUser.setUsername(jsonObject.getString("name"));
+
+                        userProfileCredentials.saveInBackground();
+                        userLocation.saveInBackground();
+                        currentUser.saveInBackground();
+                    }
+                } catch(Exception e){
+
+                }
+            }
+        });
+        request.executeAsync();
     }
 
     @Override

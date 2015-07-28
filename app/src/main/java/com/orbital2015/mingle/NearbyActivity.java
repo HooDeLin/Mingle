@@ -113,6 +113,7 @@ public class NearbyActivity extends ActionBarActivity implements ConnectionCallb
 
     @Override
     public void onConnected(Bundle bundle) {
+
         currentLocation = getLocation();
 
         ParseQuery<ParseObject> query = ParseQuery.getQuery("UserLocation");
@@ -125,7 +126,7 @@ public class NearbyActivity extends ActionBarActivity implements ConnectionCallb
                     parseObject.saveInBackground();
                 } else {
                     Toast.makeText(getApplicationContext(),
-                            "Some error just occur",
+                            "first error",
                             Toast.LENGTH_LONG).show();
                 }
             }
@@ -179,7 +180,7 @@ public class NearbyActivity extends ActionBarActivity implements ConnectionCallb
             }
         } catch(Exception e){
             Toast.makeText(getApplicationContext(),
-                    "Some error just occur",
+                    "second error",
                     Toast.LENGTH_LONG).show();
         }
     }

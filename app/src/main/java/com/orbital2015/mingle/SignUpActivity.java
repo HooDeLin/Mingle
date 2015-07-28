@@ -56,29 +56,7 @@ public class SignUpActivity extends ActionBarActivity {
                     user.signUpInBackground(new SignUpCallback() {
                         public void done(ParseException e) {
                             if (e == null) {
-                                SharedPreferences pref = getApplicationContext().getSharedPreferences("MyPref", MODE_PRIVATE);
-                                SharedPreferences.Editor editor = pref.edit();
-                                editor.putInt("radius", 1);
-                                editor.putInt("limit", 20);
-                                editor.commit();
-                                Toast.makeText(getApplicationContext(),
-                                        "Signing up success!",
-                                        Toast.LENGTH_LONG).show();
-
-                                String currentUserId = ParseUser.getCurrentUser().getObjectId().toString();
-                                ParseObject userLocation = new ParseObject("UserLocation");
-                                userLocation.put("userId", currentUserId);
-                                userLocation.put("userName", username);
-                                userLocation.saveInBackground();
-
-                                ParseObject userProfileCredentials = new ParseObject("ProfileCredentials");
-                                userProfileCredentials.put("userName", username);
-                                userProfileCredentials.put("userId", currentUserId);
-                                List<String> emptyList = new ArrayList<String>();
-                                userProfileCredentials.put("ChatHistory", emptyList);
-                                List<Integer> emptyNewMessageList = new ArrayList<Integer>();
-                                userProfileCredentials.put("NewMessage", emptyNewMessageList);
-                                userProfileCredentials.saveInBackground();
+                                newSignUpSettings();
 
                                 Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
                                 startActivity(intent);
@@ -92,6 +70,36 @@ public class SignUpActivity extends ActionBarActivity {
                 }
             }
         });
+    }
+
+    private void createPreferences(){
+        SharedPreferences pref = getApplicationContext().getSharedPreferences("MyPref", MODE_PRIVATE);
+        SharedPreferences.Editor editor = pref.edit();
+        editor.putInt("radius", 1);
+        editor.putInt("limit", 20);
+        editor.commit();
+    }
+
+    private void initializeDatabase(){
+        String currentUserId = ParseUser.getCurrentUser().getObjectId().toString();
+        ParseObject userLocation = new ParseObject("UserLocation");
+        userLocation.put("userId", currentUserId);
+        userLocation.put("userName", ParseUser.getCurrentUser().getUsername());
+        userLocation.saveInBackground();
+
+        ParseObject userProfileCredentials = new ParseObject("ProfileCredentials");
+        userProfileCredentials.put("userName", ParseUser.getCurrentUser().getUsername());
+        userProfileCredentials.put("userId", currentUserId);
+        List<String> emptyList = new ArrayList<String>();
+        userProfileCredentials.put("ChatHistory", emptyList);
+        List<Integer> emptyNewMessageList = new ArrayList<Integer>();
+        userProfileCredentials.put("newMessage", emptyNewMessageList);
+        userProfileCredentials.saveInBackground();
+    }
+
+    private void newSignUpSettings(){
+        createPreferences();
+        initializeDatabase();
     }
 
     @Override
