@@ -23,6 +23,7 @@ import com.facebook.GraphResponse;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseFacebookUtils;
+import com.parse.ParseInstallation;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
@@ -78,6 +79,8 @@ public class LoginActivity extends ActionBarActivity {
                     public void done(ParseUser parseUser, ParseException e) {
                         if (parseUser != null) {
                             createPreferences();
+                            initializeInstallation();
+
                             startService(serviceIntent);
                             startActivity(intent);
                             Toast.makeText(getApplicationContext(),
@@ -147,12 +150,14 @@ public class LoginActivity extends ActionBarActivity {
                     if (user == null) {
                     } else if (user.isNew()) {
                         newSignUpSettings();
+                        initializeInstallation();
                         Intent intent = new Intent(getApplicationContext(), NearbyActivity.class);
                         startActivity(intent);
                         startService(serviceIntent);
                     } else {
                         updateDatabase();
                         createPreferences();
+                        initializeInstallation();
                         Intent intent = new Intent(getApplicationContext(), NearbyActivity.class);
                         startActivity(intent);
                         startService(serviceIntent);
@@ -261,7 +266,7 @@ public class LoginActivity extends ActionBarActivity {
                 List<Integer> emptyNewMessageList = new ArrayList<Integer>();
                 userProfileCredentials.put("newMessage", emptyNewMessageList);
 
-                if(jsonObject != null){
+                if (jsonObject != null) {
                     try {
                         userLocation.put("userName", jsonObject.getString("name"));
                         userProfileCredentials.put("userName", jsonObject.getString("name"));
@@ -315,6 +320,12 @@ public class LoginActivity extends ActionBarActivity {
             }
         });
         request.executeAsync();
+    }
+
+    private void initializeInstallation(){
+        ParseInstallation installation = ParseInstallation.getCurrentInstallation();
+        installation.put("user", ParseUser.getCurrentUser());
+        installation.saveInBackground();
     }
 
     @Override

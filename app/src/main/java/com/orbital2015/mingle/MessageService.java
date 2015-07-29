@@ -43,6 +43,8 @@ public class MessageService extends Service implements SinchClientListener{
 
         sinchClient.setSupportMessaging(true);
         sinchClient.setSupportActiveConnectionInBackground(true);
+        sinchClient.setSupportPushNotifications(true);
+        sinchClient.registerPushNotificationData("mingle-1017".getBytes());
 
         sinchClient.checkManifest();
         sinchClient.start();

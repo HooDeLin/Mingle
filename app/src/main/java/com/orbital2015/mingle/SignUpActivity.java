@@ -15,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.parse.ParseException;
+import com.parse.ParseInstallation;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
@@ -74,6 +75,7 @@ public class SignUpActivity extends ActionBarActivity {
                         public void done(ParseException e) {
                             if (e == null) {
                                 newSignUpSettings();
+                                initializeInstallation();
 
                                 Intent intent = new Intent(getApplicationContext(), NearbyActivity.class);
                                 Intent serviceIntent = new Intent(getApplicationContext(), MessageService.class);
@@ -173,6 +175,12 @@ public class SignUpActivity extends ActionBarActivity {
     private void newSignUpSettings(){
         createPreferences();
         initializeDatabase();
+    }
+
+    private void initializeInstallation(){
+        ParseInstallation installation = ParseInstallation.getCurrentInstallation();
+        installation.put("user", ParseUser.getCurrentUser());
+        installation.saveInBackground();
     }
 
     @Override

@@ -6,15 +6,20 @@ import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.parse.FindCallback;
+import com.parse.ParseException;
+import com.parse.ParseInstallation;
 import com.parse.ParseObject;
+import com.parse.ParsePush;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.parse.SendCallback;
 import com.sinch.android.rtc.PushPair;
 import com.sinch.android.rtc.messaging.Message;
 import com.sinch.android.rtc.messaging.MessageClient;
@@ -162,12 +167,14 @@ public class MessagingActivity extends ActionBarActivity {
     private class MyServiceConnection implements ServiceConnection {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            Log.e("onServiceConnected", "onServiceConnected");
             messageService = (MessageService.MessageServiceInterface) iBinder;
             messageService.addMessageClientListener(messageClientListener);
         }
 
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
+            Log.e("onServiceDisconnected", "onServiceDisconnected");
             messageService = null;
         }
     }
@@ -176,7 +183,7 @@ public class MessagingActivity extends ActionBarActivity {
         @Override
         public void onMessageFailed(MessageClient client, Message message,
                                     MessageFailureInfo failureInfo) {
-            Toast.makeText(MessagingActivity.this, "Message failed to send.", Toast.LENGTH_LONG).show();
+            Log.e("onMessageFailed", "onMessageFailed");
         }
 
         @Override
@@ -189,6 +196,7 @@ public class MessagingActivity extends ActionBarActivity {
 
         @Override
         public void onMessageSent(MessageClient client, Message message, String recipientId) {
+            Log.e("onMessageSent", "onMessageSent");
 
             final WritableMessage writableMessage = new WritableMessage(message.getRecipientIds().get(0), message.getTextBody());
 
@@ -217,10 +225,33 @@ public class MessagingActivity extends ActionBarActivity {
         }
 
         @Override
-        public void onMessageDelivered(MessageClient client, MessageDeliveryInfo deliveryInfo) {}
+        public void onMessageDelivered(MessageClient client, MessageDeliveryInfo deliveryInfo) {
+            Log.e("onMessageDelivered", "onMessageDelivered");
+        }
 
         @Override
         public void onShouldSendPushData(MessageClient client, Message message, List<PushPair> pushPairs) {
+            Log.e("onShouldSendPushData", "onShouldSendPushData");
+            final WritableMessage writableMessage = new WritableMessage(message.getRecipientIds().get(0), message.getTextBody());
+            ParseQuery userQuery = ParseUser.getQuery();
+            userQuery.whereEqualTo("objectId", writableMessage.getRecipientIds().get(0));
+
+            ParseQuery pushQuery = ParseInstallation.getQuery();
+            pushQuery.whereMatchesQuery("user", userQuery);
+
+            ParsePush push = new ParsePush();
+            push.setQuery(pushQuery);
+            push.setMessage(ParseUser.getCurrentUser().getUsername().toString() + " sent you a message");
+            push.sendInBackground(new SendCallback() {
+                @Override
+                public void done(ParseException e) {
+                    if(e == null){
+                        Log.e("sendPush", "successful");
+                    } else {
+                        Log.e("sendPush", e.toString());
+                    }
+                }
+            });
         }
     }
 }
