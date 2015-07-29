@@ -4,7 +4,6 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
-import android.util.Log;
 
 import com.parse.ParseUser;
 import com.sinch.android.rtc.ClientRegistration;
@@ -25,12 +24,10 @@ public class MessageService extends Service implements SinchClientListener{
     private SinchClient sinchClient = null;
     private MessageClient messageClient = null;
     private String currentUserId;
-    private String regId;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         currentUserId = ParseUser.getCurrentUser().getObjectId();
-        regId = intent.getStringExtra("regId");
 
         if(currentUserId != null && !isSinchClientStarted()){
             startSinchClient(currentUserId);

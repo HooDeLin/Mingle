@@ -1,15 +1,11 @@
 package com.orbital2015.mingle;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.LocationManager;
-import android.os.AsyncTask;
-import android.provider.Settings;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -24,7 +20,6 @@ import android.widget.Toast;
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
-import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseFacebookUtils;
@@ -32,10 +27,8 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -64,34 +57,6 @@ public class LoginActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         intent = new Intent(getApplicationContext(), NearbyActivity.class);
         serviceIntent = new Intent(getApplicationContext(), MessageService.class);
-        final GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(getApplicationContext());
-
-        class RegisterGcmTask extends AsyncTask<Void, Void, String> {
-            String msg = "";
-
-            @Override
-            protected String doInBackground(Void... voids){
-                try {
-                    msg = gcm.register("your-profile-id");
-                } catch (IOException ex) {
-                    msg = "Error: " + ex.getMessage();
-                }
-
-                return msg;
-            }
-
-            @Override
-            protected void onPostExecute(String msg) {
-                intent = new Intent(getApplicationContext(), NearbyActivity.class);
-                serviceIntent = new Intent(getApplicationContext(), MessageService.class);
-
-                serviceIntent.putExtra("regId", msg);
-
-                startActivity(intent);
-                startService(serviceIntent);
-            }
-        }
-
         setContentView(R.layout.activity_login);
 
         initializeUIElement();
@@ -99,7 +64,8 @@ public class LoginActivity extends ActionBarActivity {
         ParseUser currentUser = ParseUser.getCurrentUser();
 
         if(currentUser != null){
-            (new RegisterGcmTask()).execute();
+            startService(serviceIntent);
+            startActivity(intent);
         }
 
         loginButton.setOnClickListener(new View.OnClickListener() {
@@ -112,7 +78,8 @@ public class LoginActivity extends ActionBarActivity {
                     public void done(ParseUser parseUser, ParseException e) {
                         if (parseUser != null) {
                             createPreferences();
-                            (new RegisterGcmTask()).execute();
+                            startService(serviceIntent);
+                            startActivity(intent);
                             Toast.makeText(getApplicationContext(),
                                     "Logging in success!",
                                     Toast.LENGTH_LONG).show();

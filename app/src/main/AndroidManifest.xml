@@ -8,14 +8,6 @@
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE"/>
-    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <permission android:name="com.orbital2015.mingle.permission.C2D_MESSAGE"
-        android:protectionLevel="signature" />
-    <uses-permission android:name="com.orbital2015.mingle.permission.C2D_MESSAGE" />
-    <uses-permission
-        android:name="com.google.android.c2dm.permission.RECEIVE" />
 
     <application
         android:name=".BaseApplication"
@@ -78,17 +70,6 @@
             android:name=".ViewProfileActivity"
             android:label="@string/title_activity_view_profile" >
         </activity>
-
-        <receiver
-            android:name=".GcmBroadcastReceiver"
-            android:permission="com.google.android.c2dm.permission.SEND" >
-            <intent-filter>
-                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
-                <category android:name="com.google.android.gcm.demo.app" />
-            </intent-filter>
-        </receiver>
-
-        <service android:name=".GcmIntentService" />
     </application>
 
 </manifest>
