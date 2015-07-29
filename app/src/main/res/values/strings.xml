@@ -72,7 +72,8 @@
     <string name="sign_up_password_text_view">Password</string>
     <string name="sign_up_confirm_password_text_view">Confirm Password</string>
     <string name="sign_up_button_text_view">Sign up</string>
-
+    <string name="sign_up_logged_in_as">You\'ve already signed in. You can\'t sign up again. Click to return to main page.</string>
+    <string name="sign_up_logout_text_view">Log out</string>
     <!-- End of sign up activity string values -->
 
     <!-- View Profile Activity string values -->

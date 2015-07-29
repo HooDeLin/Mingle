@@ -11,10 +11,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.parse.ParseException;
 import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SignUpCallback;
 
@@ -28,16 +30,19 @@ public class SignUpActivity extends ActionBarActivity {
     private EditText signUpPasswordEditText;
     private EditText signUpConfirmPasswordEditText;
     private Button signUpButton;
+    private TextView warningTextView;
+    private TextView signUpLoggedInAsTextView;
+    private TextView signUpLogOutTextView;
+    private TextView signUpUserNameTextView;
+    private TextView signUpPasswordTextView;
+    private TextView signUpConfirmPasswordTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
 
-        signUpUserNameEditText = (EditText) findViewById(R.id.signUpUserNameEditText);
-        signUpPasswordEditText = (EditText) findViewById(R.id.signUpPasswordEditText);
-        signUpConfirmPasswordEditText = (EditText) findViewById(R.id.signUpConfirmPasswordEditText);
-        signUpButton = (Button) findViewById(R.id.signUpButton);
+        initializeUIElements();
 
         signUpButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -45,11 +50,22 @@ public class SignUpActivity extends ActionBarActivity {
                 final String username = signUpUserNameEditText.getText().toString();
                 String password = signUpPasswordEditText.getText().toString();
                 String confirmPassword = signUpConfirmPasswordEditText.getText().toString();
-                if(!password.equals(confirmPassword)){
-                    Toast.makeText(getApplicationContext(),
-                            "There was an error signing in.",
-                            Toast.LENGTH_LONG).show();
+
+                ParseQuery<ParseUser> userQuery = ParseUser.getQuery();
+                userQuery.whereEqualTo("username", username);
+                int numberOfResult = 0;
+                try{
+                    numberOfResult = userQuery.count();
+                } catch (Exception e){}
+
+                if(numberOfResult != 0) {
+                    warningTextView.setText("Username has been taken. Please try again");
+                    warningTextView.setVisibility(View.VISIBLE);
+                } else if(!password.equals(confirmPassword)){
+                    warningTextView.setText("Password incorrect, please reenter again.");
+                    warningTextView.setVisibility(View.VISIBLE);
                 } else {
+                    warningTextView.setVisibility(View.GONE);
                     ParseUser user = new ParseUser();
                     user.setUsername(username);
                     user.setPassword(password);
@@ -71,6 +87,60 @@ public class SignUpActivity extends ActionBarActivity {
                         }
                     });
                 }
+            }
+        });
+    }
+
+    @Override
+    protected void onStart(){
+        super.onStart();
+        ParseUser currentUser = ParseUser.getCurrentUser();
+        if(currentUser != null){
+            setLoggedInLayout();
+        }
+    }
+
+    private void initializeUIElements(){
+        signUpUserNameEditText = (EditText) findViewById(R.id.signUpUserNameEditText);
+        signUpPasswordEditText = (EditText) findViewById(R.id.signUpPasswordEditText);
+        signUpConfirmPasswordEditText = (EditText) findViewById(R.id.signUpConfirmPasswordEditText);
+        signUpButton = (Button) findViewById(R.id.signUpButton);
+        warningTextView = (TextView) findViewById(R.id.warningTextView);
+        signUpLoggedInAsTextView = (TextView) findViewById(R.id.signUpLoggedInAsTextView);
+        signUpLogOutTextView = (TextView) findViewById(R.id.signUpLogOutTextView);
+        signUpUserNameTextView = (TextView) findViewById(R.id.signUpUsernameTextView);
+        signUpPasswordTextView = (TextView) findViewById(R.id.signUpPasswordTextView);
+        signUpConfirmPasswordTextView = (TextView) findViewById(R.id.signUpConfirmPasswordTextView);
+    }
+
+    private void setLoggedInLayout(){
+        signUpUserNameEditText.setVisibility(View.GONE);
+        signUpPasswordEditText.setVisibility(View.GONE);
+        signUpConfirmPasswordEditText.setVisibility(View.GONE);
+        signUpButton.setVisibility(View.GONE);
+        warningTextView.setVisibility(View.GONE);
+        signUpLoggedInAsTextView.setVisibility(View.VISIBLE);
+        signUpLogOutTextView.setVisibility(View.VISIBLE);
+        signUpUserNameTextView.setVisibility(View.GONE);
+        signUpPasswordTextView.setVisibility(View.GONE);
+        signUpConfirmPasswordEditText.setVisibility(View.GONE);
+
+        signUpLoggedInAsTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), NearbyActivity.class);
+                Intent serviceIntent = new Intent(getApplicationContext(), MessageService.class);
+                startActivity(intent);
+                startService(serviceIntent);
+            }
+        });
+
+        signUpLogOutTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ParseUser.logOut();
+                Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                startActivity(intent);
             }
         });
     }
