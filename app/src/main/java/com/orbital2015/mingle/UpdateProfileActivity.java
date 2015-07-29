@@ -26,7 +26,6 @@ import com.parse.GetCallback;
 import com.parse.GetDataCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
-import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
@@ -240,6 +239,12 @@ public class UpdateProfileActivity extends ActionBarActivity {
                 image = galleryBytes.toByteArray();
             }
         }
+    }
+
+    @Override
+    protected void onDestroy(){
+        stopService(new Intent(getApplicationContext(), MessageService.class));
+        super.onDestroy();
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

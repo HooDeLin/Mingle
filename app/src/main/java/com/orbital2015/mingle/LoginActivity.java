@@ -173,6 +173,12 @@ public class LoginActivity extends ActionBarActivity {
     }
 
     @Override
+    protected void onDestroy(){
+        stopService(new Intent(this, MessageService.class));
+        super.onDestroy();
+    }
+
+    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         ParseFacebookUtils.onActivityResult(requestCode, resultCode, data);

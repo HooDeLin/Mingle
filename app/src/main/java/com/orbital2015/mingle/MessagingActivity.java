@@ -167,14 +167,12 @@ public class MessagingActivity extends ActionBarActivity {
     private class MyServiceConnection implements ServiceConnection {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            Log.e("onServiceConnected", "onServiceConnected");
             messageService = (MessageService.MessageServiceInterface) iBinder;
             messageService.addMessageClientListener(messageClientListener);
         }
 
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
-            Log.e("onServiceDisconnected", "onServiceDisconnected");
             messageService = null;
         }
     }
@@ -183,7 +181,6 @@ public class MessagingActivity extends ActionBarActivity {
         @Override
         public void onMessageFailed(MessageClient client, Message message,
                                     MessageFailureInfo failureInfo) {
-            Log.e("onMessageFailed", "onMessageFailed");
         }
 
         @Override
@@ -196,7 +193,6 @@ public class MessagingActivity extends ActionBarActivity {
 
         @Override
         public void onMessageSent(MessageClient client, Message message, String recipientId) {
-            Log.e("onMessageSent", "onMessageSent");
 
             final WritableMessage writableMessage = new WritableMessage(message.getRecipientIds().get(0), message.getTextBody());
 
@@ -226,12 +222,10 @@ public class MessagingActivity extends ActionBarActivity {
 
         @Override
         public void onMessageDelivered(MessageClient client, MessageDeliveryInfo deliveryInfo) {
-            Log.e("onMessageDelivered", "onMessageDelivered");
         }
 
         @Override
         public void onShouldSendPushData(MessageClient client, Message message, List<PushPair> pushPairs) {
-            Log.e("onShouldSendPushData", "onShouldSendPushData");
             final WritableMessage writableMessage = new WritableMessage(message.getRecipientIds().get(0), message.getTextBody());
             ParseQuery userQuery = ParseUser.getQuery();
             userQuery.whereEqualTo("objectId", writableMessage.getRecipientIds().get(0));

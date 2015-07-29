@@ -2,6 +2,7 @@ package com.orbital2015.mingle;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Message;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -73,8 +74,14 @@ public class SettingsActivity extends ActionBarActivity {
                 ParseUser.logOut();
                 Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
                 startActivity(intent);
+                stopService(new Intent(getApplicationContext(), MessageService.class));
             }
         });
+    }
+    @Override
+    protected void onDestroy(){
+        stopService(new Intent(this, MessageService.class));
+        super.onDestroy();
     }
 
     @Override

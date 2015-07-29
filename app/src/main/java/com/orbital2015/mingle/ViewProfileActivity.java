@@ -13,7 +13,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.GetDataCallback;
 import com.parse.ParseException;
@@ -21,10 +20,7 @@ import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
-import org.w3c.dom.Text;
-
 import java.io.ByteArrayOutputStream;
-import java.util.List;
 
 
 public class ViewProfileActivity extends ActionBarActivity {
@@ -112,6 +108,12 @@ public class ViewProfileActivity extends ActionBarActivity {
             }
         });
 
+    }
+
+    @Override
+    protected void onDestroy(){
+        stopService(new Intent(getApplicationContext(), MessageService.class));
+        super.onDestroy();
     }
 
     @Override
