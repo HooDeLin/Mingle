@@ -19,6 +19,7 @@ import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.ParseUser;
 
 import java.io.ByteArrayOutputStream;
 
@@ -50,54 +51,54 @@ public class ViewProfileActivity extends ActionBarActivity {
         viewProfilePictureImageView = (ImageView) findViewById(R.id.viewProfilePictureImageView);
         viewProfileChatButton = (Button) findViewById(R.id.viewProfileChatButton);
 
-        ParseQuery query = new ParseQuery("ProfileCredentials");
-        query.whereEqualTo("userId", nearbyId);
-        query.getFirstInBackground(new GetCallback<ParseObject>() {
-            @Override
-            public void done(ParseObject parseObject, ParseException e) {
-                if (e == null) {
-                    if (parseObject.getString("userName") != null) {
-                        targetNameTextView.setText(parseObject.getString("userName"));
-                    }
-
-                    if (parseObject.getString("Nationality") != null) {
-                        targetNationalityTextView.setText(parseObject.getString("Nationality"));
-                    }
-
-                    if (parseObject.getString("Gender") != null) {
-                        targetGenderTextView.setText(parseObject.getString("Gender"));
-                    }
-
-                    if (parseObject.getString("dateOfBirth") != null) {
-                        targetDateOfBirthTextView.setText(parseObject.getString("dateOfBirth"));
-                    }
-
-                    if (parseObject.getString("Description") != null) {
-                        targetDescriptionTextView.setText(parseObject.getString("Description"));
-                    }
-
-                    ParseFile profilePicture = parseObject.getParseFile("profilePicture");
-
-                    if(profilePicture != null){
-                        profilePicture.getDataInBackground(new GetDataCallback() {
-                            @Override
-                            public void done(byte[] bytes, ParseException e) {
-                                Bitmap bitPicture = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                                ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                                bitPicture.compress(Bitmap.CompressFormat.JPEG, 90, stream);
-                                viewProfilePictureImageView.setImageBitmap(bitPicture);
-                            }
-                        });
-                    }
-                } else {
-                    Toast.makeText(getApplicationContext(),
-                            "There was an error finding user.",
-                            Toast.LENGTH_LONG).show();
-                    Intent intent = new Intent(getApplicationContext(), NearbyActivity.class);
-                    startActivity(intent);
-                }
+        ParseQuery<ParseUser> nearbyUserQuery = ParseUser.getQuery();
+        nearbyUserQuery.whereEqualTo("objectId", nearbyId);
+        try {
+            ParseUser nearbyUser = nearbyUserQuery.getFirst();
+            ParseObject nearbyUserProfile = nearbyUser.fetchIfNeeded().getParseObject("profileCredentials");
+            String username = nearbyUserProfile.fetchIfNeeded().getString("username");
+            String nationality = nearbyUserProfile.fetchIfNeeded().getString("nationality");
+            String gender = nearbyUserProfile.fetchIfNeeded().getString("gender");
+            String dateOfBirth = nearbyUserProfile.fetchIfNeeded().getString("dateOfBirth");
+            String description = nearbyUserProfile.fetchIfNeeded().getString("description");
+            if (username != null) {
+                targetNameTextView.setText(username);
             }
-        });
+
+            if (nationality != null) {
+                targetNationalityTextView.setText(nationality);
+            }
+
+            if (gender != null) {
+                targetGenderTextView.setText(gender);
+            }
+
+            if (dateOfBirth != null) {
+                targetDateOfBirthTextView.setText(dateOfBirth);
+            }
+
+            if (description != null) {
+                targetDescriptionTextView.setText(description);
+            }
+
+            ParseFile profilePicture = nearbyUserProfile.fetchIfNeeded().getParseFile("profilePicture");
+
+            if(profilePicture != null){
+                profilePicture.getDataInBackground(new GetDataCallback() {
+                    @Override
+                    public void done(byte[] bytes, ParseException e) {
+                        Bitmap bitPicture = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                        bitPicture.compress(Bitmap.CompressFormat.JPEG, 90, stream);
+                        viewProfilePictureImageView.setImageBitmap(bitPicture);
+                    }
+                });
+            }
+        } catch(Exception e){
+            Toast.makeText(getApplicationContext(),
+                    "There was an error finding user.",
+                    Toast.LENGTH_LONG).show();
+        }
 
         viewProfileChatButton.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -104,56 +104,8 @@ public class MessagingActivity extends ActionBarActivity {
         messageService.sendMessage(recipientId, messageBody);
         messageBodyField.setText("");
 
-        ParseQuery<ParseObject> userQuery = ParseQuery.getQuery("ProfileCredentials");
-        userQuery.whereEqualTo("userId", ParseUser.getCurrentUser().getObjectId().toString());
-
-        ParseQuery<ParseObject> recipientQuery = ParseQuery.getQuery("ProfileCredentials");
-        recipientQuery.whereEqualTo("userId", recipientId);
-
-        try {
-            ParseObject userParseObject = userQuery.getFirst();
-            ParseObject recipientParseObject = recipientQuery.getFirst();
-
-            List<String> userChatHistory = userParseObject.getList("ChatHistory");
-            List<Integer> userNewMessage = userParseObject.getList("newMessage");
-            List<String> recipientChatHistory = recipientParseObject.getList("ChatHistory");
-            List<Integer> recipientNewMessage = recipientParseObject.getList("newMessage");
-
-            if(userChatHistory.size() == 0){
-                userChatHistory.add(recipientId);
-                userParseObject.put("ChatHistory", userChatHistory);
-                userNewMessage.add(0);
-                userParseObject.put("newMessage", userNewMessage);
-                userParseObject.save();
-            } else {
-                userChatHistory.remove(recipientId);
-                userChatHistory.add(0, recipientId);
-                userParseObject.put("ChatHistory", userChatHistory);
-                userNewMessage.add(0);
-                userParseObject.put("newMessage", userNewMessage);
-                userParseObject.save();
-            }
-
-            if(recipientChatHistory.size() == 0){
-                recipientChatHistory.add(currentUserId);
-                recipientParseObject.put("ChatHistory", recipientChatHistory);
-                recipientNewMessage.add(0);
-                recipientParseObject.put("newMessage", userNewMessage);
-                recipientParseObject.save();
-            } else {
-
-                recipientChatHistory.remove(currentUserId);
-                recipientChatHistory.add(0, currentUserId);
-                recipientParseObject.put("ChatHistory", recipientChatHistory);
-                recipientNewMessage.add(0);
-                recipientParseObject.put("newMessage", userNewMessage);
-                recipientParseObject.save();
-            }
-        } catch(Exception e) {
-
-        }
-
-
+        //update your own chat history
+        //update your recipient chat history
 
     }
 

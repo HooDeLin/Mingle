@@ -11,6 +11,7 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -51,6 +52,7 @@ public class UpdateProfileActivity extends ActionBarActivity {
     private EditText description;
     private EditText dateOfBirthEditText;
     private ImageView profilePictureImageView;
+    private String profileCredentialsId;
     int REQUEST_CAMERA = 0, SELECT_FILE = 1;
     private byte[] image;
 
@@ -74,84 +76,70 @@ public class UpdateProfileActivity extends ActionBarActivity {
 
         final String currentUserId = ParseUser.getCurrentUser().getObjectId();
 
-        ParseQuery<ParseObject> profileCredentialsQuery = ParseQuery.getQuery("ProfileCredentials");
-        profileCredentialsQuery.whereEqualTo("userId", currentUserId);
-        profileCredentialsQuery.findInBackground(new FindCallback<ParseObject>() {
-            @Override
-            public void done(List<ParseObject> list, ParseException e) {
-                if (e == null) {
-                    ParseObject queryRow = list.get(0);
-                    nameEditText.setText(queryRow.getString("userName"));
-                    nationalityEditText.setText(queryRow.getString("Nationality"));
-                    description.setText(queryRow.getString("Description"));
-                    dateOfBirthEditText.setText(queryRow.getString("dateOfBirth"));
+        try {
+            ParseObject currentProfile = ParseUser.getCurrentUser().fetchIfNeeded().getParseObject("profileCredentials");
+            profileCredentialsId = currentProfile.getObjectId().toString();
+            nameEditText.setText(currentProfile.fetchIfNeeded().getString("username"));
+            nationalityEditText.setText(currentProfile.fetchIfNeeded().getString("nationality"));
+            description.setText(currentProfile.fetchIfNeeded().getString("description"));
+            dateOfBirthEditText.setText(currentProfile.fetchIfNeeded().getString("dateOfBirth"));
 
-                    ParseFile profilePicture = queryRow.getParseFile("profilePicture");
-                    if(profilePicture != null){
-                        profilePicture.getDataInBackground(new GetDataCallback() {
-                            @Override
-                            public void done(byte[] bytes, ParseException e) {
-                                Bitmap bitPicture = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                                ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                                bitPicture.compress(Bitmap.CompressFormat.JPEG, 90, stream);
-                                profilePictureImageView.setImageBitmap(bitPicture);
-                            }
-                        });
+            ParseFile profilePicture = currentProfile.fetchIfNeeded().getParseFile("profilePicture");
+            if(profilePicture != null){
+                profilePicture.getDataInBackground(new GetDataCallback() {
+                    @Override
+                    public void done(byte[] bytes, ParseException e) {
+                        Bitmap bitPicture = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                        bitPicture.compress(Bitmap.CompressFormat.JPEG, 90, stream);
+                        profilePictureImageView.setImageBitmap(bitPicture);
                     }
+                });
+            }
 
-                    String currentGender = queryRow.getString("Gender");
-                    if (currentGender != null) {
-                        if (currentGender.equals("Male")) {
-                            maleRadio.toggle();
-                        } else if (currentGender.equals("Female")) {
-                            femaleRadio.toggle();
-                        } else if (currentGender.equals("Others")) {
-                            otherGenderRadio.toggle();
-                        }
-                    }
-
-                } else {
-                    //something is wrong
+            String currentGender = currentProfile.fetchIfNeeded().getString("gender");
+            if (currentGender != null) {
+                if (currentGender.equals("Male")) {
+                    maleRadio.toggle();
+                } else if (currentGender.equals("Female")) {
+                    femaleRadio.toggle();
+                } else if (currentGender.equals("Others")) {
+                    otherGenderRadio.toggle();
                 }
             }
-        });
-
+        } catch(Exception e){
+            Log.e("viewProfile", e.toString());
+        }
+        Log.e("profileCredentialsId", profileCredentialsId);
         saveUpdateProfileButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ParseQuery<ParseObject> query = ParseQuery.getQuery("ProfileCredentials");
-                query.whereEqualTo("userId", currentUserId);
-                query.getFirstInBackground(new GetCallback<ParseObject>() {
+                ParseQuery<ParseObject> currentProfileQuery = ParseQuery.getQuery("ProfileCredentials");
+                currentProfileQuery.getInBackground(profileCredentialsId, new GetCallback<ParseObject>() {
                     @Override
-                    public void done(ParseObject parseObject, ParseException e) {
-                        if (e == null) {
-                            parseObject.put("userName", nameEditText.getText().toString());
-                            parseObject.put("Nationality", nationalityEditText.getText().toString());
-                            parseObject.put("Description", description.getText().toString());
-                            parseObject.put("dateOfBirth", dateOfBirthEditText.getText().toString());
+                    public void done(ParseObject currentProfile, ParseException e) {
+                        currentProfile.put("username", nameEditText.getText().toString());
+                        currentProfile.put("nationality", nationalityEditText.getText().toString());
+                        currentProfile.put("description", description.getText().toString());
+                        currentProfile.put("dateOfBirth", dateOfBirthEditText.getText().toString());
 
-                            if(image != null){
-                                ParseFile imageFile = new ParseFile("profilePicture.png", image);
-                                parseObject.put("profilePicture", imageFile);
-                            }
-
-                            if (maleRadio.isChecked()) {
-                                parseObject.put("Gender", "Male");
-                            } else if (femaleRadio.isChecked()) {
-                                parseObject.put("Gender", "Female");
-                            } else if (otherGenderRadio.isChecked()) {
-                                parseObject.put("Gender", "Others");
-                            }
-
-                            parseObject.saveInBackground();
-
-                            Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
-                            startActivity(intent);
-                        } else {
-                            Toast.makeText(getApplicationContext(),
-                                    "Some error just occur",
-                                    Toast.LENGTH_LONG).show();
+                        if (image != null) {
+                            ParseFile imageFile = new ParseFile("profilePicture.png", image);
+                            currentProfile.put("profilePicture", imageFile);
                         }
+
+                        if (maleRadio.isChecked()) {
+                            currentProfile.put("gender", "Male");
+                        } else if (femaleRadio.isChecked()) {
+                            currentProfile.put("gender", "Female");
+                        } else if (otherGenderRadio.isChecked()) {
+                            currentProfile.put("gender", "Others");
+                        }
+
+                        currentProfile.saveInBackground();
+
+                        Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
+                        startActivity(intent);
                     }
                 });
             }

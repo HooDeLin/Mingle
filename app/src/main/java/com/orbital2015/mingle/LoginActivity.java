@@ -261,25 +261,24 @@ public class LoginActivity extends ActionBarActivity {
         GraphRequest request = GraphRequest.newMeRequest(AccessToken.getCurrentAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
             @Override
             public void onCompleted(JSONObject jsonObject, GraphResponse graphResponse) {
-                String currentUserId = ParseUser.getCurrentUser().getObjectId().toString();
                 ParseUser currentUser = ParseUser.getCurrentUser();
+                String currentUserId = currentUser.getObjectId().toString();
                 ParseObject userLocation = new ParseObject("UserLocation");
-                ParseObject userProfileCredentials = new ParseObject("ProfileCredentials");
                 userLocation.put("userId", currentUserId);
-                userProfileCredentials.put("userId", currentUserId);
+                ParseObject userProfileCredentials = new ParseObject("ProfileCredentials");
+                userProfileCredentials.put("username", currentUser.getUsername());
                 List<String> emptyList = new ArrayList<String>();
-                userProfileCredentials.put("ChatHistory", emptyList);
+                userLocation.put("profileCredentials", userProfileCredentials);
+                userProfileCredentials.put("chatHistory", emptyList);
                 List<Integer> emptyNewMessageList = new ArrayList<Integer>();
                 userProfileCredentials.put("newMessage", emptyNewMessageList);
+                currentUser.put("userLocation", userLocation);
+                currentUser.put("profileCredentials", userProfileCredentials);
 
                 if (jsonObject != null) {
                     try {
-                        userLocation.put("userName", jsonObject.getString("name"));
-                        userProfileCredentials.put("userName", jsonObject.getString("name"));
                         currentUser.setUsername(jsonObject.getString("name"));
                         currentUser.save();
-                        userProfileCredentials.save();
-                        userLocation.save();
                     } catch (Exception e) {
                         Log.e("Saving info", "failed");
                     }
@@ -299,24 +298,11 @@ public class LoginActivity extends ActionBarActivity {
             @Override
             public void onCompleted(JSONObject jsonObject, GraphResponse graphResponse) {
                 try {
-                    String currentUserId = ParseUser.getCurrentUser().getObjectId().toString();
-
                     ParseUser currentUser = ParseUser.getCurrentUser();
-                    ParseQuery<ParseObject> profileCredentialsQuery = ParseQuery.getQuery("ProfileCredentials");
-                    ParseQuery<ParseObject> userLocationQuery = ParseQuery.getQuery("UserLocation");
-                    profileCredentialsQuery.whereEqualTo("userId", currentUserId);
-                    userLocationQuery.whereEqualTo("userId", currentUserId);
-                    ParseObject userProfileCredentials = profileCredentialsQuery.getFirst();
-                    ParseObject userLocation = userLocationQuery.getFirst();
 
                     if(jsonObject != null) {
                         if(!ParseUser.getCurrentUser().getUsername().equals(jsonObject.getString("name"))){
-                            userLocation.put("userName", jsonObject.getString("name"));
-                            userProfileCredentials.put("userName", jsonObject.getString("name"));
                             currentUser.setUsername(jsonObject.getString("name"));
-
-                            userProfileCredentials.save();
-                            userLocation.save();
                             currentUser.save();
                         }
                     }

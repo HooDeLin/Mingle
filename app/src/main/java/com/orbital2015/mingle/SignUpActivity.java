@@ -154,20 +154,23 @@ public class SignUpActivity extends ActionBarActivity {
     }
 
     private void initializeDatabase(){
-        String currentUserId = ParseUser.getCurrentUser().getObjectId().toString();
-        ParseObject userLocation = new ParseObject("UserLocation");
-        userLocation.put("userId", currentUserId);
-        userLocation.put("userName", ParseUser.getCurrentUser().getUsername());
-        userLocation.saveInBackground();
+        try {
+            ParseUser currentUser = ParseUser.getCurrentUser();
+            String currentUserId = currentUser.getObjectId().toString();
+            ParseObject userLocation = new ParseObject("UserLocation");
+            ParseObject userProfileCredentials = new ParseObject("ProfileCredentials");
+            List<String> emptyList = new ArrayList<String>();
+            userLocation.put("userId", currentUserId);
+            userLocation.put("profileCredentials", userProfileCredentials);
+            userProfileCredentials.put("chatHistory", emptyList);
+            List<Integer> emptyNewMessageList = new ArrayList<Integer>();
+            userProfileCredentials.put("newMessage", emptyNewMessageList);
+            currentUser.put("userLocation", userLocation);
+            currentUser.put("profileCredentials", userProfileCredentials);
+            currentUser.save();
+        } catch (Exception e){
 
-        ParseObject userProfileCredentials = new ParseObject("ProfileCredentials");
-        userProfileCredentials.put("userName", ParseUser.getCurrentUser().getUsername());
-        userProfileCredentials.put("userId", currentUserId);
-        List<String> emptyList = new ArrayList<String>();
-        userProfileCredentials.put("ChatHistory", emptyList);
-        List<Integer> emptyNewMessageList = new ArrayList<Integer>();
-        userProfileCredentials.put("newMessage", emptyNewMessageList);
-        userProfileCredentials.saveInBackground();
+        }
     }
 
     private void newSignUpSettings(){

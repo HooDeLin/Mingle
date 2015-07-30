@@ -1,6 +1,8 @@
 package com.orbital2015.mingle;
 
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -8,12 +10,15 @@ import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -51,7 +56,6 @@ public class NearbyActivity extends ActionBarActivity implements ConnectionCallb
     private SharedPreferences yourSettings;
     private int currentRadius;
     private int currentLimit;
-    private Bitmap bitPicture;
     private TextView noNearbyTextView;
     private Button mingleButton;
 
@@ -64,6 +68,8 @@ public class NearbyActivity extends ActionBarActivity implements ConnectionCallb
         currentLimit = yourSettings.getInt("limit", 0);
         noNearbyTextView = (TextView) findViewById(R.id.noNearbyTextView);
         chatButton = (Button) findViewById(R.id.chatButton);
+        mingleButton = (Button) findViewById(R.id.mingleButton);
+        settingsButton = (Button) findViewById(R.id.settingsButton);
 
         chatButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -73,8 +79,6 @@ public class NearbyActivity extends ActionBarActivity implements ConnectionCallb
             }
         });
 
-        settingsButton = (Button) findViewById(R.id.settingsButton);
-
         settingsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -82,20 +86,18 @@ public class NearbyActivity extends ActionBarActivity implements ConnectionCallb
                 startActivity(intent);
             }
         });
+
         if(servicesConnected()){
             buildGoogleApiClient();
         }
 
         currentUserId = ParseUser.getCurrentUser().getObjectId();
 
-        mingleButton = (Button) findViewById(R.id.mingleButton);
+
         mingleButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                currentLocation = getLocation();
-
-                recordLocation(currentLocation);
-                setListView(currentLocation);
+                showInputDialog();
             }
         });
     }
@@ -134,6 +136,7 @@ public class NearbyActivity extends ActionBarActivity implements ConnectionCallb
                 if (e == null) {
                     Intent intent = new Intent(getApplicationContext(), ViewProfileActivity.class);
                     intent.putExtra("NEARBY_ID", user.get(0).getObjectId());
+                    Log.e("openProfileError", user.get(0).getObjectId());
                     startActivity(intent);
                 } else {
                     Toast.makeText(getApplicationContext(),
@@ -208,47 +211,45 @@ public class NearbyActivity extends ActionBarActivity implements ConnectionCallb
         }
     }
 
-    private void recordLocation(Location userLocation){
-        ParseQuery<ParseObject> query = ParseQuery.getQuery("UserLocation");
-        query.whereEqualTo("userId", ParseUser.getCurrentUser().getObjectId());
+    private void recordLocationAndSavePost(Location userLocation, String post){
         try {
-            ParseObject queryObject = query.getFirst();
-            queryObject.put("userLocation", new ParseGeoPoint(currentLocation.getLatitude(), currentLocation.getLongitude()));
-            queryObject.save();
-
-        } catch(Exception e){
-
-        }
+            ParseObject parseObject = ParseUser.getCurrentUser().getParseObject("userLocation").fetchIfNeeded();
+            parseObject.put("userLocation", new ParseGeoPoint(userLocation.getLatitude(), userLocation.getLongitude()));
+            parseObject.put("post", post);
+            parseObject.put("isOnline", true);
+            parseObject.saveInBackground();
+        } catch(Exception e){}
     }
 
     private void setListView(Location currentLocation){
         userListItems = new ArrayList<UserListItem>();
 
         ParseQuery<ParseObject> nearbyQuery = ParseQuery.getQuery("UserLocation");
-        nearbyQuery.whereNotEqualTo("userId", currentUserId);
+        nearbyQuery.whereNotEqualTo("userId", ParseUser.getCurrentUser().getObjectId().toString());
+        nearbyQuery.whereEqualTo("isOnline", true);
         ParseGeoPoint currentGeoPoint = new ParseGeoPoint(currentLocation.getLatitude(), currentLocation.getLongitude());
         nearbyQuery.whereWithinKilometers("userLocation", currentGeoPoint, currentRadius);
         nearbyQuery.setLimit(currentLimit);
         try{
             List<ParseObject> nearbyList = nearbyQuery.find();
-            for(int i = 0; i < nearbyList.size(); i ++){
+            Log.e("number of results", Integer.toString(nearbyList.size()));
+            for(int i = 0; i < nearbyList.size(); i ++) {
                 UserListItem currentUserListItem;
                 ParseObject currentParseObject = nearbyList.get(i);
-                String currentParseObjectUserId = currentParseObject.getString("userId");
+                String currentPost = currentParseObject.getString("post");
+                String currentName;
+                Bitmap bitPicture;
+                ParseObject currentProfile = currentParseObject.fetchIfNeeded().getParseObject("profileCredentials");
+                currentName = currentProfile.fetchIfNeeded().getString("username");
 
-                ParseQuery<ParseObject> profilePicQuery = ParseQuery.getQuery("ProfileCredentials");
-                profilePicQuery.whereEqualTo("userId", currentParseObjectUserId);
-
-                ParseObject profilePicObject = profilePicQuery.getFirst();
-                ParseFile profilePicture = profilePicObject.getParseFile("profilePicture");
-                if(profilePicture == null){
+                ParseFile profilePicFile = currentProfile.fetchIfNeeded().getParseFile("profilePicture");
+                if (profilePicFile == null) {
                     bitPicture = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
                 } else {
-                    byte[] bytes = profilePicture.getData();
+                    byte[] bytes = profilePicFile.getData();
                     bitPicture = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
                 }
-
-                currentUserListItem = new UserListItem(currentParseObject.getString("userName"), bitPicture, "");
+                currentUserListItem = new UserListItem(currentName, bitPicture, currentPost);
                 userListItems.add(currentUserListItem);
             }
 
@@ -270,7 +271,34 @@ public class NearbyActivity extends ActionBarActivity implements ConnectionCallb
             }
 
         } catch(Exception e){
-
         }
+    }
+
+    private void showInputDialog(){
+        LayoutInflater layoutInflater = LayoutInflater.from(NearbyActivity.this);
+        View promptView = layoutInflater.inflate(R.layout.post_item, null);
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(NearbyActivity.this);
+        alertDialogBuilder.setView(promptView);
+
+        final EditText editText = (EditText) promptView.findViewById(R.id.postItemEditText);
+        alertDialogBuilder.setCancelable(false)
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        currentLocation = getLocation();
+                        String inputText = editText.getText().toString();
+                        recordLocationAndSavePost(currentLocation, inputText);
+                        setListView(currentLocation);
+                    }
+                })
+                .setNegativeButton("Cancel",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+                            }
+                        });
+
+        // create an alert dialog
+        AlertDialog alert = alertDialogBuilder.create();
+        alert.show();
     }
 }

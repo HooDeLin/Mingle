@@ -85,4 +85,9 @@
     <string name="target_nationality_text_view">No Nationality Available</string>
     <string name="target_description_text_view">No Description Available</string>
     <!-- End of view profile activity string values -->
+
+    <!-- Post Item string values -->
+    <string name="post_item_text_view">Create post to make yourself discoverable</string>
+    <string name="post_item_hint">What\'s on your mind</string>
+    <!-- End of post item string values -->
 </resources>
