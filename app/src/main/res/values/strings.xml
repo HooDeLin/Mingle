@@ -16,6 +16,7 @@
     <string name="sign_up_link">Don\'t have an account yet? Click here to sign up!</string>
     <string name="back_main_page_text_view">Back to main page</string>
     <string name="gps_internet_enable_text_view">Please ensure your internet connection exists and location service is enabled</string>
+    <string name="about_us_text_view">About us</string>
     <!--End of login activity string values -->
 
     <!--Top buttons string values -->
@@ -90,5 +91,6 @@
     <string name="post_item_text_view">Create post to make yourself discoverable</string>
     <string name="post_item_hint">What\'s on your mind</string>
     <string name="character_count_placeholder">0/30</string>
+    <string name="title_activity_about_us">AboutUsActivity</string>
     <!-- End of post item string values -->
 </resources>

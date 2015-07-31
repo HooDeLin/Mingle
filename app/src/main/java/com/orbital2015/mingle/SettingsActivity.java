@@ -9,6 +9,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.parse.ParseUser;
 
@@ -19,6 +20,7 @@ public class SettingsActivity extends ActionBarActivity {
     private Button updateProfileButton;
     private Button editSearchButton;
     private Button logoutButton;
+    private TextView settingsAboutUsTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +77,15 @@ public class SettingsActivity extends ActionBarActivity {
                 Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
                 startActivity(intent);
                 stopService(new Intent(getApplicationContext(), MessageService.class));
+            }
+        });
+
+        settingsAboutUsTextView = (TextView) findViewById(R.id.settingsAboutUsTextView);
+        settingsAboutUsTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), AboutUsActivity.class);
+                startActivity(intent);
             }
         });
     }

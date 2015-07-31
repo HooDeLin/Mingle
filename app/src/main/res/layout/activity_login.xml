@@ -57,10 +57,9 @@
         android:layout_height="wrap_content"
         android:text="@string/login_button_text_view"
         android:id="@+id/loginButton"
-        android:layout_marginTop="29dp"
+        android:visibility="visible"
         android:layout_below="@+id/loginPasswordEditText"
-        android:layout_centerHorizontal="true"
-        android:visibility="visible"/>
+        android:layout_centerHorizontal="true" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -87,9 +86,10 @@
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:text="@string/sign_up_link"
         android:id="@+id/signUpLink"
-        android:layout_alignParentBottom="true"
+        android:visibility="visible"
+        android:layout_below="@+id/facebookLoginButton"
         android:layout_centerHorizontal="true"
-        android:visibility="visible"/>
+        android:layout_marginTop="35dp" />
 
     <Button
         android:layout_width="wrap_content"
@@ -110,10 +110,10 @@
         android:paddingRight="@dimen/com_facebook_share_button_padding_right"
         android:paddingBottom="@dimen/com_facebook_share_button_padding_bottom"
         android:onClick="onFacebookLoginClick"
+        android:visibility="visible"
         android:layout_below="@+id/loginButton"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="27dp"
-        android:visibility="visible"/>
+        android:layout_marginTop="29dp" />
 
     <ImageView
         android:layout_width="180dp"
@@ -133,4 +133,13 @@
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true"
         android:visibility="gone"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="@string/about_us_text_view"
+        android:id="@+id/aboutUsTextView"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true" />
 </RelativeLayout>

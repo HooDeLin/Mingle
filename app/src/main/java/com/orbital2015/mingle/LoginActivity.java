@@ -52,6 +52,7 @@ public class LoginActivity extends ActionBarActivity {
     private TextView loggedInAs;
     private TextView backToMainPageTextView;
     private TextView gpsInternetEnableTextView;
+    private TextView aboutUsTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,6 +101,14 @@ public class LoginActivity extends ActionBarActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), SignUpActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        aboutUsTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), AboutUsActivity.class);
                 startActivity(intent);
             }
         });
@@ -195,6 +204,7 @@ public class LoginActivity extends ActionBarActivity {
         loggedInAs = (TextView) findViewById(R.id.loggedInTextView);
         backToMainPageTextView = (TextView) findViewById(R.id.backToMainPageTextView);
         gpsInternetEnableTextView = (TextView) findViewById(R.id.gpsInternetEnableTextView);
+        aboutUsTextView = (TextView) findViewById(R.id.aboutUsTextView);
     }
 
     private void setGPSEnableLayout(){
@@ -206,6 +216,7 @@ public class LoginActivity extends ActionBarActivity {
         loginButton.setVisibility(View.GONE);
         facebookLoginButton.setVisibility(View.GONE);
         loggedInAs.setVisibility(View.GONE);
+        aboutUsTextView.setVisibility(View.GONE);
         backToMainPageTextView.setVisibility(View.GONE);
         gpsInternetEnableTextView.setVisibility(View.VISIBLE);
     }
@@ -219,6 +230,7 @@ public class LoginActivity extends ActionBarActivity {
         loginButton.setVisibility(View.GONE);
         facebookLoginButton.setVisibility(View.GONE);
         gpsInternetEnableTextView.setVisibility(View.GONE);
+        aboutUsTextView.setVisibility(View.GONE);
         backToMainPageTextView.setVisibility(View.VISIBLE);
         loggedInAs.setVisibility(View.VISIBLE);
     }
@@ -230,6 +242,7 @@ public class LoginActivity extends ActionBarActivity {
         loginUsernameEditText.setVisibility(View.VISIBLE);
         signUpLink.setVisibility(View.VISIBLE);
         loginButton.setVisibility(View.VISIBLE);
+        aboutUsTextView.setVisibility(View.VISIBLE);
         facebookLoginButton.setVisibility(View.VISIBLE);
         loggedInAs.setVisibility(View.GONE);
         backToMainPageTextView.setVisibility(View.GONE);
