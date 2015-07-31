@@ -74,16 +74,16 @@ public class SignUpActivity extends ActionBarActivity {
 
                     user.signUpInBackground(new SignUpCallback() {
                         public void done(ParseException e) {
-                            progressDialog.dismiss();
                             if (e == null) {
                                 newSignUpSettings();
                                 initializeInstallation();
-
+                                progressDialog.dismiss();
                                 Intent intent = new Intent(getApplicationContext(), NearbyActivity.class);
                                 Intent serviceIntent = new Intent(getApplicationContext(), MessageService.class);
                                 startActivity(intent);
                                 startService(serviceIntent);
                             } else {
+                                progressDialog.dismiss();
                                 Toast.makeText(getApplicationContext(),
                                         "There was an error signing in.",
                                         Toast.LENGTH_LONG).show();
@@ -167,6 +167,7 @@ public class SignUpActivity extends ActionBarActivity {
             userLocation.put("userId", currentUserId);
             userLocation.put("profileCredentials", userProfileCredentials);
             userProfileCredentials.put("chatHistory", emptyList);
+            userProfileCredentials.put("username", currentUser.getUsername());
             List<Integer> emptyNewMessageList = new ArrayList<Integer>();
             userProfileCredentials.put("newMessage", emptyNewMessageList);
             currentUser.put("userLocation", userLocation);
