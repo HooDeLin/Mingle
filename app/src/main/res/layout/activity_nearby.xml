@@ -47,7 +47,8 @@
         android:layout_alignRight="@+id/mingleButton"
         android:layout_alignEnd="@+id/mingleButton"
         android:layout_below="@+id/buttonContainer"
-        android:layout_above="@+id/mingleButton">
+        android:layout_above="@+id/mingleButton"
+        android:visibility="gone">
     </ListView>
 
     <TextView
@@ -65,6 +66,20 @@
         android:layout_alignParentEnd="true"
         android:visibility="gone"/>
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/nearby_instruction"
+        android:id="@+id/nearbyInstructionTextView"
+        android:gravity="center"
+        android:layout_below="@+id/buttonContainer"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="49dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
     <Button
         style="?android:attr/buttonStyleSmall"
         android:layout_width="wrap_content"
@@ -74,5 +89,29 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/posted_text_view"
+        android:id="@+id/postedTextView"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/usersListView"
+        android:layout_alignBottom="@+id/mingleButton"
+        android:layout_toLeftOf="@+id/refreshListButton"
+        android:layout_toStartOf="@+id/refreshListButton"
+        android:visibility="gone"/>
+
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Refresh"
+        android:id="@+id/refreshListButton"
+        android:layout_alignParentBottom="true"
+        android:layout_toLeftOf="@+id/mingleButton"
+        android:layout_toStartOf="@+id/mingleButton"
+        android:visibility="gone"/>
 
 </RelativeLayout>

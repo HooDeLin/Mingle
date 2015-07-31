@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.parse.ParseObject;
 import com.parse.ParseUser;
 
 
@@ -69,10 +70,8 @@ public class SettingsActivity extends ActionBarActivity {
         logoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SharedPreferences pref = getApplicationContext().getSharedPreferences("MyPref", MODE_PRIVATE);
-                SharedPreferences.Editor editor = pref.edit();
-                editor.clear();
-                editor.commit();
+                clearPreferences();
+                stayOffline();
                 ParseUser.logOut();
                 Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
                 startActivity(intent);
@@ -115,5 +114,21 @@ public class SettingsActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void stayOffline(){
+        try {
+            ParseObject parseObject = ParseUser.getCurrentUser().getParseObject("userLocation").fetchIfNeeded();
+            parseObject.put("post", "");
+            parseObject.put("isOnline", false);
+            parseObject.saveInBackground();
+        } catch(Exception e){}
+    }
+
+    private void clearPreferences(){
+        SharedPreferences pref = getApplicationContext().getSharedPreferences("MyPref", MODE_PRIVATE);
+        SharedPreferences.Editor editor = pref.edit();
+        editor.clear();
+        editor.commit();
     }
 }

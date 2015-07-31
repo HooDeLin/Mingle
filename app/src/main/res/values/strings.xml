@@ -25,7 +25,10 @@
     <string name="settings_button_text_view">Settings</string>
 
     <!--Nearby activity string values -->
-    <string name="no_nearby_text_view">Aww... There\'s no people near you</string>
+    <string name="no_nearby_text_view">Aww... There\'s no people near you, try again later</string>
+    <string name="posted_text_view">You posted: ...</string>
+    <string name="nearby_instruction">Click mingle to create post and find users nearby</string>
+    <string name="nearby_refresh_button_text_view">Refresh</string>
     <!-- End of nearby activity string values -->
 
     <!--Main activity string values -->
