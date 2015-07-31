@@ -307,8 +307,14 @@ public class NearbyActivity extends ActionBarActivity implements ConnectionCallb
                     public void onClick(DialogInterface dialog, int id) {
                         currentLocation = getLocation();
                         String inputText = editText.getText().toString();
-                        recordLocationAndSavePost(currentLocation, inputText);
-                        setListView(currentLocation);
+                        if(inputText.length() == 0){
+                            Toast.makeText(getApplicationContext(),
+                                    "Please enter a post", Toast.LENGTH_LONG)
+                                    .show();
+                        } else {
+                            recordLocationAndSavePost(currentLocation, inputText);
+                            setListView(currentLocation);
+                        }
                     }
                 })
                 .setNegativeButton("Cancel",
@@ -321,11 +327,5 @@ public class NearbyActivity extends ActionBarActivity implements ConnectionCallb
         // create an alert dialog
         AlertDialog alert = alertDialogBuilder.create();
         alert.show();
-
-        if(editText.getText().length() == 0){
-            alert.getButton(Dialog.BUTTON_POSITIVE).setClickable(false);
-        }else{
-            alert.getButton(Dialog.BUTTON_NEGATIVE).setClickable(true);
-        }
     }
 }
