@@ -73,11 +73,13 @@ public class LoginActivity extends ActionBarActivity {
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                progressDialog = ProgressDialog.show(LoginActivity.this, "", "Logging in...", true);
                 m_username = loginUsernameEditText.getText().toString();
                 m_password = loginPasswordEditText.getText().toString();
                 ParseUser.logInInBackground(m_username, m_password, new LogInCallback() {
                     @Override
                     public void done(ParseUser parseUser, ParseException e) {
+                        progressDialog.dismiss();
                         if (parseUser != null) {
                             createPreferences();
                             initializeInstallation();

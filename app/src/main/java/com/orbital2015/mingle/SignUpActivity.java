@@ -1,5 +1,6 @@
 package com.orbital2015.mingle;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.ActionBarActivity;
@@ -35,6 +36,7 @@ public class SignUpActivity extends ActionBarActivity {
     private TextView signUpUserNameTextView;
     private TextView signUpPasswordTextView;
     private TextView signUpConfirmPasswordTextView;
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +48,7 @@ public class SignUpActivity extends ActionBarActivity {
         signUpButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                progressDialog = ProgressDialog.show(SignUpActivity.this, "", "Signing you in...", true);
                 final String username = signUpUserNameEditText.getText().toString();
                 String password = signUpPasswordEditText.getText().toString();
                 String confirmPassword = signUpConfirmPasswordEditText.getText().toString();
@@ -71,6 +74,7 @@ public class SignUpActivity extends ActionBarActivity {
 
                     user.signUpInBackground(new SignUpCallback() {
                         public void done(ParseException e) {
+                            progressDialog.dismiss();
                             if (e == null) {
                                 newSignUpSettings();
                                 initializeInstallation();
