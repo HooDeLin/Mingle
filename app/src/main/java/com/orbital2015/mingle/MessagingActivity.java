@@ -13,6 +13,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.parse.FindCallback;
+import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseInstallation;
 import com.parse.ParseObject;
@@ -35,6 +36,7 @@ import java.util.List;
 public class MessagingActivity extends ActionBarActivity {
 
     private String recipientId;
+    private String recipientProfileCredentialsId;
     private EditText messageBodyField;
     private String messageBody;
     private MessageService.MessageServiceInterface messageService;
@@ -53,6 +55,7 @@ public class MessagingActivity extends ActionBarActivity {
 
         Intent intent = getIntent();
         recipientId = intent.getStringExtra("RECIPIENT_ID");
+        recipientProfileCredentialsId = intent.getStringExtra("NEARBY_PROFILE_CREDENTIALS_ID");
         currentUserId = ParseUser.getCurrentUser().getObjectId();
 
         messagesList = (ListView) findViewById(R.id.listMessages);
@@ -104,9 +107,25 @@ public class MessagingActivity extends ActionBarActivity {
         messageService.sendMessage(recipientId, messageBody);
         messageBodyField.setText("");
 
-        //update your own chat history
-        //update your recipient chat history
+        try {
+            final ParseObject userProfile = ParseUser.getCurrentUser().getParseObject("profileCredentials").fetchIfNeeded();
+            final String userProfileId = userProfile.getObjectId();
+            Log.e("testing", recipientProfileCredentialsId);
+            ParseQuery<ParseObject> recipientQuery = ParseQuery.getQuery("ProfileCredentials");
+            recipientQuery.whereEqualTo("objectId", recipientProfileCredentialsId);
+            recipientQuery.getInBackground(recipientProfileCredentialsId, new GetCallback<ParseObject>() {
+                @Override
+                public void done(ParseObject parseObject, ParseException e) {
+                    parseObject.addUnique("chatHistory", userProfileId);
+                    parseObject.saveInBackground();
+                }
+            });
 
+            userProfile.addUnique("chatHistory", recipientProfileCredentialsId);
+            userProfile.saveInBackground();
+
+        } catch(Exception e){
+        }
     }
 
     @Override
