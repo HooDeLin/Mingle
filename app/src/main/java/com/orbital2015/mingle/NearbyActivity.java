@@ -2,6 +2,7 @@ package com.orbital2015.mingle;
 
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -10,6 +11,8 @@ import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -279,8 +282,26 @@ public class NearbyActivity extends ActionBarActivity implements ConnectionCallb
         View promptView = layoutInflater.inflate(R.layout.post_item, null);
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(NearbyActivity.this);
         alertDialogBuilder.setView(promptView);
+        final TextView characterCountTextView = (TextView) promptView.findViewById(R.id.characterCounterTextView);
 
         final EditText editText = (EditText) promptView.findViewById(R.id.postItemEditText);
+        editText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                String characterCountString = String.format("%d/%d", editText.getText().length(), 30);
+                characterCountTextView.setText(characterCountString);
+            }
+        });
         alertDialogBuilder.setCancelable(false)
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
@@ -300,5 +321,11 @@ public class NearbyActivity extends ActionBarActivity implements ConnectionCallb
         // create an alert dialog
         AlertDialog alert = alertDialogBuilder.create();
         alert.show();
+
+        if(editText.getText().length() == 0){
+            alert.getButton(Dialog.BUTTON_POSITIVE).setClickable(false);
+        }else{
+            alert.getButton(Dialog.BUTTON_NEGATIVE).setClickable(true);
+        }
     }
 }

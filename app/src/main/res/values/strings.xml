@@ -89,5 +89,6 @@
     <!-- Post Item string values -->
     <string name="post_item_text_view">Create post to make yourself discoverable</string>
     <string name="post_item_hint">What\'s on your mind</string>
+    <string name="character_count_placeholder">0/30</string>
     <!-- End of post item string values -->
 </resources>
