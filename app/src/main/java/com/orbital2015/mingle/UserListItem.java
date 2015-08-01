@@ -7,11 +7,13 @@ public class UserListItem {
     private String memberName;
     private Bitmap profilePic;
     private String status;
+    private String id;
 
-    public UserListItem(String memberName, Bitmap profilePic, String status){
+    public UserListItem(String memberName, Bitmap profilePic, String status, String id){
         this.memberName = memberName;
         this.profilePic = profilePic;
         this.status = status;
+        this.id = id;
     }
 
     public String getMemberName(){
@@ -36,6 +38,14 @@ public class UserListItem {
 
     public void setStatus(String newStatus){
         status = newStatus;
+    }
+
+    public String getId(){
+        return id;
+    }
+
+    public void setId(String newId){
+        id = newId;
     }
 
 }

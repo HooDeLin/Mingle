@@ -149,15 +149,21 @@ public class NearbyActivity extends ActionBarActivity implements ConnectionCallb
         query.whereEqualTo("username", userListItems.get(position).getMemberName());
         query.findInBackground(new FindCallback<ParseUser>() {
             public void done(List<ParseUser> user, ParseException e) {
-                if (e == null) {
-                    Intent intent = new Intent(getApplicationContext(), ViewProfileActivity.class);
-                    intent.putExtra("NEARBY_ID", user.get(0).getObjectId());
-                    Log.e("openProfileError", user.get(0).getObjectId());
-                    startActivity(intent);
-                } else {
-                    Toast.makeText(getApplicationContext(),
-                            "Error finding that user",
-                            Toast.LENGTH_SHORT).show();
+                try {
+                    if (e == null) {
+                        Intent intent = new Intent(getApplicationContext(), ViewProfileActivity.class);
+                        Bundle extras = new Bundle();
+                        extras.putString("NEARBY_ID", user.get(0).getObjectId());
+                        extras.putString("NEARBY_PROFILE_CREDENTIALS_ID", user.get(0).getParseObject("profileCredentials").fetchIfNeeded().getObjectId());
+                        intent.putExtras(extras);
+                        startActivity(intent);
+                    } else {
+                        Toast.makeText(getApplicationContext(),
+                                "Error finding that user",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                } catch(Exception ex){
+                    Log.e("profile error", ex.toString());
                 }
             }
         });
@@ -270,7 +276,7 @@ public class NearbyActivity extends ActionBarActivity implements ConnectionCallb
                     byte[] bytes = profilePicFile.getData();
                     bitPicture = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
                 }
-                currentUserListItem = new UserListItem(currentName, bitPicture, currentPost);
+                currentUserListItem = new UserListItem(currentName, bitPicture, currentPost, "");
                 userListItems.add(currentUserListItem);
             }
 

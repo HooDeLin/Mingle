@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -34,6 +35,7 @@ public class ViewProfileActivity extends ActionBarActivity {
     private TextView targetGenderTextView;
     private ImageView viewProfilePictureImageView;
     private Button viewProfileChatButton;
+    private String currentProfileId;
 
 
     @Override
@@ -41,7 +43,11 @@ public class ViewProfileActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_profile);
         Intent intent = getIntent();
-        nearbyId = intent.getStringExtra("NEARBY_ID");
+        Bundle extras = intent.getExtras();
+        nearbyId = extras.getString("NEARBY_ID");
+        currentProfileId = extras.getString("NEARBY_PROFILE_CREDENTIALS_ID");
+        Log.e("currentProfileId", currentProfileId);
+        Log.e("nearbyId", nearbyId);
 
         targetDateOfBirthTextView = (TextView) findViewById(R.id.targetDateOfBirthTextView);
         targetDescriptionTextView = (TextView) findViewById(R.id.targetDescriptionTextView);
@@ -105,6 +111,7 @@ public class ViewProfileActivity extends ActionBarActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), MessagingActivity.class);
                 intent.putExtra("RECIPIENT_ID", nearbyId);
+                intent.putExtra("NEARBY_PROFILE_CREDENTIALS_ID", currentProfileId);
                 startActivity(intent);
             }
         });

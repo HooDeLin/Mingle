@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -36,6 +37,7 @@ public class MainActivity extends ActionBarActivity {
     private Bitmap bitPicture;
     private TextView noPreviousChatTextView;
     ParseObject parseObject;
+    private static ParseQuery<ParseUser> chatHistoryQuery;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,81 +65,66 @@ public class MainActivity extends ActionBarActivity {
                 startActivity(intent);
             }
         });
-
-        currentUserID = ParseUser.getCurrentUser().getObjectId().toString();
-        userListItems = new ArrayList<UserListItem>();
-
-        ParseQuery<ParseObject> query = ParseQuery.getQuery("ProfileCredentials");
-        query.whereEqualTo("userId", currentUserID);
-
         try {
-            parseObject = query.getFirst();
-            List<String> chatHistory = new ArrayList<String>();
-            chatHistory = parseObject.getList("ChatHistory");
-            List<Integer> newMessageList = new ArrayList<Integer>();
-            newMessageList = parseObject.getList("newMessage");
-
-            if(chatHistory.size() == 0){
-                usersListView.setVisibility(View.GONE);
-                noPreviousChatTextView.setVisibility(View.VISIBLE);
-            } else {
-                for(int i = 0; i < chatHistory.size(); i ++){
-                    UserListItem currentUserListItem;
-                    String currentParseObjectUserId = chatHistory.get(i);
-
-                    ParseQuery<ParseObject> profilePicQuery = ParseQuery.getQuery("ProfileCredentials");
-                    profilePicQuery.whereEqualTo("userId", currentParseObjectUserId);
-
-                    ParseObject profilePicObject = profilePicQuery.getFirst();
-                    ParseFile profilePicture = profilePicObject.getParseFile("profilePicture");
-                    if (profilePicture == null) {
-                        bitPicture = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
-                    } else {
-                        byte[] bytes = profilePicture.getData();
-                        bitPicture = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                    }
-                    ParseQuery<ParseObject> userNameQuery = ParseQuery.getQuery("ProfileCredentials");
-                    userNameQuery.whereEqualTo("userId", currentParseObjectUserId);
-                    String currentName = userNameQuery.getFirst().getString("userName");
-                    if(newMessageList.get(i) == 1){
-                        currentUserListItem = new UserListItem(currentName, bitPicture, "New Message!");
-                    } else {
-                        currentUserListItem = new UserListItem(currentName, bitPicture, "");
-                    }
-                    userListItems.add(currentUserListItem);
-                }
-
-                UserListItemAdapter userListItemAdapter = new UserListItemAdapter(getApplicationContext(), userListItems);
-
-                usersListView.setAdapter(userListItemAdapter);
-
-                usersListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        openConversation(userListItems, position);
-                    }
-                });
+            ParseObject currentUserParseObject = ParseUser.getCurrentUser().fetchIfNeeded().getParseObject("profileCredentials");
+            List<String> listString = currentUserParseObject.fetchIfNeeded().getList("chatHistory");
+            ParseQuery<ParseObject> profileCredentialsQuery;
+            List<ParseQuery<ParseObject>> queryList = new ArrayList<ParseQuery<ParseObject>>();
+            for(int i = 0; i < listString.size(); i ++){
+                ParseQuery<ParseObject> credentialsQuery = ParseQuery.getQuery("ProfileCredentials");
+                credentialsQuery.whereEqualTo("objectId", listString.get(i));
+                queryList.add(credentialsQuery);
             }
-        } catch (Exception e){
-            Toast.makeText(getApplicationContext(),
-                    e.toString(),
-                    Toast.LENGTH_LONG).show();
+            userListItems = new ArrayList<UserListItem>();
+            profileCredentialsQuery = ParseQuery.or(queryList);
+            profileCredentialsQuery.findInBackground(new FindCallback<ParseObject>() {
+                @Override
+                public void done(List<ParseObject> list, ParseException e) {
+                    try {
+                        for (int i = 0; i < list.size(); i++) {
+                            UserListItem currentUserListItem;
+                            ParseObject currentProfile = list.get(i);
+                            String currentUsername = currentProfile.getString("username");
+                            String currentUsernameId = currentProfile.getObjectId();
+                            ParseFile profilePicFile = currentProfile.getParseFile("profilePicture");
+                            if (profilePicFile == null) {
+                                bitPicture = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
+                            } else {
+                                byte[] bytes = profilePicFile.getData();
+                                bitPicture = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                            }
+                            currentUserListItem = new UserListItem(currentUsername, bitPicture, "", currentUsernameId);
+                            userListItems.add(currentUserListItem);
+                            UserListItemAdapter userListItemAdapter = new UserListItemAdapter(getApplicationContext(), userListItems);
+
+                            usersListView.setAdapter(userListItemAdapter);
+
+                            usersListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                                @Override
+                                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                    openConversation(userListItems, position);
+                                }
+                            });
+                        }
+                    } catch (Exception ex) {
+                    }
+                }
+            });
+        } catch(Exception e){
+            Log.e("error", e.toString());
         }
     }
 
     public void openConversation(ArrayList<UserListItem> userListItems, int pos) {
-        List<Integer> newMessageList = parseObject.getList("newMessage");
-        newMessageList.remove(pos);
-        newMessageList.add(pos, 0);
-        parseObject.put("newMessage", newMessageList);
-        parseObject.saveInBackground();
         ParseQuery<ParseUser> query = ParseUser.getQuery();
         query.whereEqualTo("username", userListItems.get(pos).getMemberName());
+        final String profileCredentialsId = userListItems.get(pos).getId();
         query.findInBackground(new FindCallback<ParseUser>() {
             public void done(List<ParseUser> user, ParseException e) {
                 if (e == null) {
                     Intent intent = new Intent(getApplicationContext(), MessagingActivity.class);
                     intent.putExtra("RECIPIENT_ID", user.get(0).getObjectId());
+                    intent.putExtra("NEARBY_PROFILE_CREDENTIALS_ID", profileCredentialsId);
                     startActivity(intent);
                 } else {
                     Toast.makeText(getApplicationContext(),

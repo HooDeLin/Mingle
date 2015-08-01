@@ -125,6 +125,7 @@ public class MessagingActivity extends ActionBarActivity {
             userProfile.saveInBackground();
 
         } catch(Exception e){
+            Log.e("error", e.toString());
         }
     }
 
