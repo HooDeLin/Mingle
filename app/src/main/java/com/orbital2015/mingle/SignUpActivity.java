@@ -168,8 +168,6 @@ public class SignUpActivity extends ActionBarActivity {
             userLocation.put("profileCredentials", userProfileCredentials);
             userProfileCredentials.put("chatHistory", emptyList);
             userProfileCredentials.put("username", currentUser.getUsername());
-            List<Integer> emptyNewMessageList = new ArrayList<Integer>();
-            userProfileCredentials.put("newMessage", emptyNewMessageList);
             currentUser.put("userLocation", userLocation);
             currentUser.put("profileCredentials", userProfileCredentials);
             currentUser.save();

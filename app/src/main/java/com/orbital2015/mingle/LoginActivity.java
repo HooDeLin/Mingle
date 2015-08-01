@@ -285,8 +285,6 @@ public class LoginActivity extends ActionBarActivity {
                 List<String> emptyList = new ArrayList<String>();
                 userLocation.put("profileCredentials", userProfileCredentials);
                 userProfileCredentials.put("chatHistory", emptyList);
-                List<Integer> emptyNewMessageList = new ArrayList<Integer>();
-                userProfileCredentials.put("newMessage", emptyNewMessageList);
                 currentUser.put("userLocation", userLocation);
                 currentUser.put("profileCredentials", userProfileCredentials);
 
